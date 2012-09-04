@@ -1,0 +1,37 @@
+{
+	"name": "apprunner",
+	"description": "Manage application errors and plugin modules by Harald Rudell",
+	"author": "Harald Rudell <harald@allgoodapps.com>",
+	"keywords": [
+		"operations",
+		"email",
+		"notification"
+	],
+	"version": "0.0.0",
+	"private": true,
+	"contributors": [
+		{
+			"name": "Harald Rudell",
+			"email": "harald@allgoodapps.com",
+			"web": "http://blog.haraldrudell.com"
+		}
+	],
+	"devDependencies": {
+		"mochawrapper": ">= 0.0.31"
+	},
+	"dependencies": {
+		"haraldutil": ">= 0.1.5",
+		"applego": "git+ssh://gt:applego.git"
+	},
+	"repository": {
+		"type": "private git",
+		"url": "git+ssh://gt:apprunner"
+	},
+	"main": "./lib/apprunner",
+	"scripts": {
+		"test": "mocha --ui exports --reporter spec",
+		"monitor": "mocha --ui exports --reporter min --watch",
+		"debugtest": "mocha --debug-brk --ui exports --reporter spec",
+		"coverage": "mochacoverage"
+	}
+}
