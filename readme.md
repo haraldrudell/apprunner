@@ -88,8 +88,8 @@ TODO
 
 # Notes
 
-(c) [Harald Rudell](http://www.haraldrudell.com) wrote this for node in October, 2011
+(c) [Harald Rudell](http://www.haraldrudell.com) wrote this for node in September, 2012
 
 No warranty expressed or implied. Use at your own risk.
 
-Please suggest better ways, new features, and possible difficulties on [github](https://github.com/haraldrudell/haraldutil)
+Please suggest better ways, new features, and possible difficulties on [github](https://github.com/haraldrudell/apprunner)
