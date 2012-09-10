@@ -1,11 +1,15 @@
 {
 	"name": "apprunner",
 	"description": "Manage application errors and plugin modules by Harald Rudell",
-	"author": "Harald Rudell <harald@allgoodapps.com>",
+	"author": "Harald Rudell <harald@allgoodapps.com> (http://www.haraldrudell.com)",
 	"keywords": [
-		"operations",
+		"require",
+		"plugins",
+		"api",
+		"npm",
+		"errors",
 		"email",
-		"notification"
+		"app"
 	],
 	"version": "0.0.0",
 	"private": true,
@@ -13,7 +17,7 @@
 		{
 			"name": "Harald Rudell",
 			"email": "harald@allgoodapps.com",
-			"web": "http://blog.haraldrudell.com"
+			"web": "http://www.haraldrudell.com"
 		}
 	],
 	"devDependencies": {
@@ -23,8 +27,8 @@
 		"haraldutil": ">= 0.1.5"
 	},
 	"repository": {
-		"type": "private git",
-		"url": "git+ssh://gt:apprunner"
+		"type": "git",
+		"url": "https://github.com/haraldrudell/apprunner"
 	},
 	"main": "./lib/apprunner",
 	"scripts": {

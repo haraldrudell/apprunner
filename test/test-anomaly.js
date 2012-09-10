@@ -2,102 +2,97 @@
 // © Harald Rudell 2012
 
 var anomaly = require('../lib/anomaly')
+// https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 
 var anomalySubject = 'Anomaly Report'
 var anomalyBodyStart = 'Anomaly '
 
 exports['Anomaly:'] = {
-	'Text': function () {
-		var mockMail = getMockSendMail(anomalySubject)
-		var mockLog = getMockLog()
-		var anomalyArg = 'haha'
+	'Init and Down': function (done) {
+		anomaly.initAnomaly()
+		anomaly.anomalyDown(downResult)
 
-		// init
-		anomaly.initAnomaly({}, mockMail.sendMail, mockLog.log)
+		function downResult() {
+			done()
+		}
+	},
+	'Enable Anomaly Mail': function (done) {
+		var logs = 0
+		var mails = 0
 
-		// verify one anomaly
-		mockMail.allowInvocation()
-		mockLog.allowInvocation()
-		anomaly.anomaly(anomalyArg)
-		mockMail.verifyInvocations()
-		var body = mockMail.getBody()
-		assert.equal(body.substring(0, anomalyBodyStart.length), anomalyBodyStart)
-		var found = body.indexOf('1: \'' + anomalyArg + '\'') != -1
-		assert.ok(found)
-		mockLog.verifyInvocations()
+		anomaly.initAnomaly({}, mockMail, mockLog)
+		anomaly.anomalyDown(downResult)
 
-		// verify second is queued
-		mockLog.allowInvocation()
-		anomaly.anomaly('haha2')
-		mockMail.verifyInvocations()
-		mockLog.verifyInvocations()
+		function downResult() {
+			assert.equal(anomaly.enableAnomalyMail(true), true)
+			assert.equal(logs, 0)
+			assert.equal(anomaly.enableAnomalyMail(false), false)
+			assert.equal(logs, 1)
+			assert.equal(mails, 0)
 
-		// shutDown
-		anomaly.anomalyDown()
+			done()
+		}
+
+		function mockLog() {
+			logs++
+		}
+		function mockMail() {
+			mails++
+		}
+	},
+	'Anomaly': function (done) {
+		var logs = 0
+		var aSendMail = []
+		var eSubject = 'Anomaly Report'
+		var anomaly1 = 'haha1'
+		var anomaly2 = 'haha2'
+		var anomaly3 = 'haha3'
+
+		anomaly.initAnomaly({maxBuffer: 1}, mockSendMail, mockLog)
+		anomaly.enableAnomalyMail(true)
+
+		// first anomaly: immediately sent
+		anomaly.anomaly(anomaly1)
+		assert.equal(aSendMail.length, 1)
+		assert.equal(aSendMail[0][0], eSubject)
+		assert.deepEqual(typeof aSendMail[0][1], 'string')
+		assert.ok(~aSendMail[0][1].indexOf(anomaly1))
+		assert.equal(logs, 1, 'Console.log invocations: each anomaly should be logged')
+
+		// second anomaly: queued
+		// third anomaly: skipped
+		logs = 0
+		aSendMail = []
+		anomaly.anomaly(anomaly2)
+		anomaly.anomaly(anomaly3)
+		assert.equal(aSendMail.length, 0)
+		assert.equal(logs, 2, 'Console.log invocations: each anomaly should be logged')
+
+		// shutDown: should send
+		anomaly.anomalyDown(downResult)
+
+		function downResult() {
+			assert.equal(aSendMail.length, 1)
+			assert.equal(aSendMail[0][0], eSubject)
+			assert.deepEqual(typeof aSendMail[0][1], 'string')
+			assert.ok(~aSendMail[0][1].indexOf(anomaly2))
+			assert.ok(!~aSendMail[0][1].indexOf(anomaly3))
+			assert.ok(~aSendMail[0][1].indexOf('Skipped:1'))
+			assert.equal(logs, 2)
+
+			done()
+		}
 
 		function log() {
 			console.log('anomaly log:', arguments)
 		}
-	},
-}
-
-function getMockLog() {
-	var logPending = 0
-	var logActual = 0
-
-	return {
-		log: log,
-		allowInvocation: allowInvocation,
-		verifyInvocations: verifyInvocations,
-	}
-
-	function allowInvocation() {
-		logPending++
-	}
-	function verifyInvocations() {
-		if (logPending != logActual) throw Error('Missing log invocation')
-	}
-
-	function log() {
-		if (++logActual != logPending) {
-			var string = ''
-			Array.prototype.slice.call(arguments, 0).forEach(function (value) {
-				string += value
-			})
-			throw Error('Unforeseen log invocation:\'' + string + '\'')
+		function mockSendMail(subject, body) {
+			aSendMail.push([subject, body])
 		}
-	}
-}
-
-function getMockSendMail(subject) {
-	var sendMailPending = 0
-	var sendMailActual = 0
-	var body
-
-	return {
-		sendMail: mockSendMail,
-		allowInvocation: allowInvocation,
-		getBody: getBody,
-		verifyInvocations: verifyInvocations,
-	}
-
-	function allowInvocation() {
-		sendMailPending++
-	}
-	function getBody() {
-		return body
-	}
-	function verifyInvocations() {
-		if (sendMailPending != sendMailActual) throw Error('Missing sendMail invocation')
-	}
-	function mockSendMail(s, b) {
-		if (++sendMailActual != sendMailPending) throw Error('Unforeseen sendmail invocation')
-		if (typeof s != 'string' || typeof b != 'string') throw Error('Bad sendmail parameters')
-		if (s != subject) throw Error('Incorrect sendMail subject:' +
-			s +
-			' instead of ' +
-			subject)
-		body = b
-	}
+		function mockLog(a) {
+//console.error(arguments.callee.name, a)
+			logs++
+		}
+	},
 }

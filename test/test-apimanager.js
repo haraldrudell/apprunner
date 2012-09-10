@@ -9,6 +9,8 @@ var assert = require('mochawrapper')
 
 var apitest = require('./apiFolder/apitest')
 
+var _log = console.log
+
 var defaults = {
 	init: {
 		appFolder: true,
@@ -16,6 +18,9 @@ var defaults = {
 	api: {
 		folder: path.join(__dirname, 'apiFolder'),
 		apiMap: {
+			apinull: {
+				onLoad: true
+			},
 		},
 	},
 }
@@ -29,24 +34,52 @@ function errorListener() {
 	throw Error()
 }
 
-exports['Init Api:'] = {
-	'Invocation': function (done) {
+exports['API Manager:'] = {
+	'Init Api': function (done) {
+		var consoleLogs = 0
+		var aInitApi = []
+
+		console.log = mockConsoleLog
+		require('./apiFolder/apinull').setInitApi(mockInitApi)
+
 		var actual = apimanager.initApi(defaults, app, errorListener, callback)
 
 		function callback(err) {
+			console.log = _log
 			assert.ok(!err)
 			assert.equal(typeof actual, 'object')
 			assert.equal(typeof actual.emit, 'function')
 
 			done()
 		}
+		function mockConsoleLog(a) {
+			consoleLogs++
+		}
+		function mockInitApi(opts, cb) {
+//console.error(arguments.callee.name, opts)
+			assert.equal(typeof opts, 'object')
+			assert.equal(typeof opts.config, 'object')
+			assert.equal(typeof opts.registerHandler, 'function')
+			assert.equal(typeof opts.getApi, 'function')
+			assert.equal(typeof opts.logger, 'function')
+			assert.equal(Object.keys(opts).length, 4)
+			assert.equal(typeof cb, 'function')
+			aInitApi.push(opts.config)
+			cb()
+		}
 	},
-}
+	'after': function () {
+		console.log = _log
+	}
 
-exports['Get Api:'] = {
+}
+/*
+exports['API Manager Get Api:'] = {
 	'before': function (done) {
+		console.log = function () {}
 		apimanager.initApi(defaults, app, errorListener, callback)
 		function callback(err) {
+			console.log = _log
 			if (err) throw err
 			done()
 		}
@@ -64,6 +97,7 @@ exports['Get Api:'] = {
 			done()
 		}
 
+		// invoked when apimanager load apitest
 		function initApi(opts, cb) {
 			assert.equal(typeof opts, 'object', 'opts type')
 			assert.equal(typeof opts.logger, 'function', 'opts.logger')
@@ -74,4 +108,4 @@ exports['Get Api:'] = {
 			cb(null, value)
 		}
 	},
-}
+}*/
