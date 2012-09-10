@@ -1,5 +1,7 @@
 # App Runner
 
+App Runner allows to to generate and maintain many apps using shared code. Require is great, App Runner is greater!
+
 App Runner does three things:
 * Provides loadable apis
 * Manages application errors
