@@ -1,0 +1,153 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@1.1.48
+3 info using node@v0.8.6
+4 verbose config file /home/foxyboy/.npmrc
+5 verbose config file /usr/local/etc/npmrc
+6 verbose config file /usr/local/lib/node_modules/npm/npmrc
+7 verbose publish [ '.' ]
+8 verbose read json /home/foxyboy/Desktop/c505/node/apprunner/package.json
+9 verbose cache add [ '.', null ]
+10 silly cache add name=undefined spec="." args=[".",null]
+11 verbose parsed url { pathname: '.', path: '.', href: '.' }
+12 silly lockFile 3a52ce78- .
+13 verbose lock . /home/foxyboy/.npm/3a52ce78-.lock
+14 verbose read json package.json
+15 verbose tar pack [ '/home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz',
+15 verbose tar pack   '.' ]
+16 verbose tarball /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz
+17 verbose folder .
+18 info prepublish apprunner@0.0.0
+19 silly lockFile 035c4275-79523-0-9628479068633169-tmp-tgz /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz
+20 verbose lock /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz /home/foxyboy/.npm/035c4275-79523-0-9628479068633169-tmp-tgz.lock
+21 silly lockFile 035c4275-79523-0-9628479068633169-tmp-tgz /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz
+22 verbose tar unpack /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/tmp.tgz
+23 silly lockFile 6962c8bd-79523-0-9628479068633169-package /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package
+24 verbose lock /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package /home/foxyboy/.npm/6962c8bd-79523-0-9628479068633169-package.lock
+25 silly gunzTarPerm modes [ '755', '644' ]
+26 silly gunzTarPerm extractEntry package.json
+27 silly gunzTarPerm modified mode [ 'package.json', 436, 420 ]
+28 silly gunzTarPerm extractEntry .npmignore
+29 silly gunzTarPerm modified mode [ '.npmignore', 436, 420 ]
+30 silly gunzTarPerm extractEntry readme.md
+31 silly gunzTarPerm modified mode [ 'readme.md', 436, 420 ]
+32 silly gunzTarPerm extractEntry lib/appinit.js
+33 silly gunzTarPerm modified mode [ 'lib/appinit.js', 436, 420 ]
+34 silly gunzTarPerm extractEntry lib/apprunner.js
+35 silly gunzTarPerm modified mode [ 'lib/apprunner.js', 436, 420 ]
+36 silly gunzTarPerm extractEntry lib/appshutdown.js
+37 silly gunzTarPerm modified mode [ 'lib/appshutdown.js', 436, 420 ]
+38 silly gunzTarPerm extractEntry lib/anomaly.js
+39 silly gunzTarPerm modified mode [ 'lib/anomaly.js', 436, 420 ]
+40 silly gunzTarPerm extractEntry lib/apperror.js
+41 silly gunzTarPerm modified mode [ 'lib/apperror.js', 436, 420 ]
+42 silly gunzTarPerm extractEntry lib/apimanager.js
+43 silly gunzTarPerm modified mode [ 'lib/apimanager.js', 436, 420 ]
+44 silly gunzTarPerm extractEntry test/test-appinit.js
+45 silly gunzTarPerm modified mode [ 'test/test-appinit.js', 436, 420 ]
+46 silly gunzTarPerm extractEntry test/test-appshutdown.js
+47 silly gunzTarPerm modified mode [ 'test/test-appshutdown.js', 436, 420 ]
+48 silly gunzTarPerm extractEntry test/test-apperror.js
+49 silly gunzTarPerm modified mode [ 'test/test-apperror.js', 436, 420 ]
+50 silly gunzTarPerm extractEntry test/test-apimanager.js
+51 silly gunzTarPerm modified mode [ 'test/test-apimanager.js', 436, 420 ]
+52 silly gunzTarPerm extractEntry test/test-anomaly.js
+53 silly gunzTarPerm modified mode [ 'test/test-anomaly.js', 436, 420 ]
+54 silly gunzTarPerm extractEntry test/test-package.js
+55 silly gunzTarPerm modified mode [ 'test/test-package.js', 436, 420 ]
+56 silly gunzTarPerm extractEntry test/apiFolder/apinull.js
+57 silly gunzTarPerm modified mode [ 'test/apiFolder/apinull.js', 436, 420 ]
+58 silly gunzTarPerm extractEntry test/apiFolder/apitest.js
+59 silly gunzTarPerm modified mode [ 'test/apiFolder/apitest.js', 436, 420 ]
+60 verbose read json /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package/package.json
+61 silly lockFile 6962c8bd-79523-0-9628479068633169-package /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package
+62 verbose from cache /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package/package.json
+63 verbose tar pack [ '/home/foxyboy/.npm/apprunner/0.0.0/package.tgz',
+63 verbose tar pack   '/home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package' ]
+64 verbose tarball /home/foxyboy/.npm/apprunner/0.0.0/package.tgz
+65 verbose folder /home/foxyboy/tmp/npm-12980/1347308079523-0.9628479068633169/package
+66 silly lockFile 5b1ca5f6--npm-apprunner-0-0-0-package-tgz /home/foxyboy/.npm/apprunner/0.0.0/package.tgz
+67 verbose lock /home/foxyboy/.npm/apprunner/0.0.0/package.tgz /home/foxyboy/.npm/5b1ca5f6--npm-apprunner-0-0-0-package-tgz.lock
+68 silly lockFile 5b1ca5f6--npm-apprunner-0-0-0-package-tgz /home/foxyboy/.npm/apprunner/0.0.0/package.tgz
+69 silly lockFile af7a49fa-yboy-npm-apprunner-0-0-0-package /home/foxyboy/.npm/apprunner/0.0.0/package
+70 verbose lock /home/foxyboy/.npm/apprunner/0.0.0/package /home/foxyboy/.npm/af7a49fa-yboy-npm-apprunner-0-0-0-package.lock
+71 silly lockFile af7a49fa-yboy-npm-apprunner-0-0-0-package /home/foxyboy/.npm/apprunner/0.0.0/package
+72 verbose tar unpack /home/foxyboy/.npm/apprunner/0.0.0/package.tgz
+73 silly lockFile af7a49fa-yboy-npm-apprunner-0-0-0-package /home/foxyboy/.npm/apprunner/0.0.0/package
+74 verbose lock /home/foxyboy/.npm/apprunner/0.0.0/package /home/foxyboy/.npm/af7a49fa-yboy-npm-apprunner-0-0-0-package.lock
+75 silly gunzTarPerm modes [ '755', '644' ]
+76 silly gunzTarPerm extractEntry package.json
+77 silly gunzTarPerm extractEntry .npmignore
+78 silly gunzTarPerm extractEntry readme.md
+79 silly gunzTarPerm extractEntry lib/appinit.js
+80 silly gunzTarPerm extractEntry lib/apprunner.js
+81 silly gunzTarPerm extractEntry lib/appshutdown.js
+82 silly gunzTarPerm extractEntry lib/anomaly.js
+83 silly gunzTarPerm extractEntry lib/apperror.js
+84 silly gunzTarPerm extractEntry lib/apimanager.js
+85 silly gunzTarPerm extractEntry test/test-appinit.js
+86 silly gunzTarPerm extractEntry test/test-appshutdown.js
+87 silly gunzTarPerm extractEntry test/test-apperror.js
+88 silly gunzTarPerm extractEntry test/test-apimanager.js
+89 silly gunzTarPerm extractEntry test/test-anomaly.js
+90 silly gunzTarPerm extractEntry test/test-package.js
+91 silly gunzTarPerm extractEntry test/apiFolder/apinull.js
+92 silly gunzTarPerm extractEntry test/apiFolder/apitest.js
+93 verbose read json /home/foxyboy/.npm/apprunner/0.0.0/package/package.json
+94 silly lockFile af7a49fa-yboy-npm-apprunner-0-0-0-package /home/foxyboy/.npm/apprunner/0.0.0/package
+95 silly shasum updated bytes 8186
+96 info shasum fb7cd59be53252eba2f69dafc1a67aeea702d8e0
+96 info shasum /home/foxyboy/.npm/apprunner/0.0.0/package.tgz
+97 verbose from cache /home/foxyboy/.npm/apprunner/0.0.0/package/package.json
+98 verbose chmod /home/foxyboy/.npm/apprunner/0.0.0/package.tgz 644
+99 verbose chown /home/foxyboy/.npm/apprunner/0.0.0/package.tgz [ 1000, 1000 ]
+100 silly lockFile 3a52ce78- .
+101 silly publish { name: 'apprunner',
+101 silly publish   description: 'Manage application errors and plugin modules by Harald Rudell',
+101 silly publish   author:
+101 silly publish    { name: 'Harald Rudell',
+101 silly publish      email: 'harald@allgoodapps.com',
+101 silly publish      url: 'http://www.haraldrudell.com' },
+101 silly publish   keywords: [ 'require', 'plugins', 'api', 'npm', 'errors', 'email', 'app' ],
+101 silly publish   version: '0.0.0',
+101 silly publish   private: true,
+101 silly publish   contributors:
+101 silly publish    [ { name: 'Harald Rudell',
+101 silly publish        email: 'harald@allgoodapps.com',
+101 silly publish        url: 'http://www.haraldrudell.com' } ],
+101 silly publish   devDependencies: { mochawrapper: '>= 0.0.31' },
+101 silly publish   dependencies: { haraldutil: '>= 0.1.5' },
+101 silly publish   repository:
+101 silly publish    { type: 'git',
+101 silly publish      url: 'https://github.com/haraldrudell/apprunner' },
+101 silly publish   main: './lib/apprunner',
+101 silly publish   scripts:
+101 silly publish    { test: 'mocha --ui exports --reporter spec',
+101 silly publish      monitor: 'mocha --ui exports --reporter min --watch',
+101 silly publish      debugtest: 'mocha --debug-brk --ui exports --reporter spec',
+101 silly publish      coverage: 'mochacoverage' },
+101 silly publish   readme: '# App Runner\n\nApp Runner allows to to generate and maintain many apps using shared code. Require is great, App Runner is greater!\n\nApp Runner does three things:\n* Provides loadable apis\n* Manages application errors\n* Emails anomaly reports\n\nWhy App Runner? App Runner is App Lego.\n\nIf you make many Web apps and you have several of them for example accessing Facebook or using the same type of database, App Runner enables you to architect that in a repeatable pattern. App Runner allows you to use json to configure where code comes from and its settings.\n\n# Reference\n\nApp Runner handles process exceptions and SIGINT.\n* Exit code 0 is SIGINT\n* Exit code 2 is unhandled exception\n\n## initApp(defaults, app, cb)\n\n* defaults: options, typically loaded by haraldops\n\n  * .init.appFolder: string: the folder of initial script\n  * .init.logger: optional function(string): logging, default console.log\n  * .init.ops.sendMail: optional function(subject, body): Sends mail, default none\n  * .api: optional, indicates that Api Manager should be used\n  * .api.apiMap: api configurations\n\n* app: Web server, has .on and .get methods\n* cb(err): optional function\n\n## getApi(opts, cb)\n\nget an api implementation\n* opts: object\n* .api: string: name of api function to be loaded\n* cb(err, module)\n\nAPIs are either configured directly in opts, or in defaults provided at App Runner init\n\nIf module has module.emitter, APp Runner will listen and manage error events\n\n## anomaly(...)\n\nReport any argument as an anomaly, to the log and if so configured a periodcal email.\n\n## enableAnomalyMail(flag)\n\ncontrol emailing on or off: flag: boolean, default: false\n\n## getCbCounter()\nEnsures that all callbacks has completed\n\n```js\nvar haraldutil = require(\'haraldutil\')\nvar cbc = haraldutil.getCbCounter()\nsetTimeout(cbc.add(callback), 100)\nsetTimeout(cbc.add(callback), 100)\n\nfunction callback() {\n  if (cbc.isDone(arguments.callee))\n    console.log(\'All callbacks completed.\')\n  else console.log(\'Not done yet...\')\n}\n```\n```\nNot done yet...\nAll callbacks completed.\n```\nvar cbc = getCbCounter(opts)\n* opts: optional object\n* opts.emitter: optional event emitter or boolean. default: errors are thrown\n\n  * false: errors are ignored\n  * emitter: errors are emitted\n\n* opts.callback: function or array of function: add is done for each function\n\ncbc: object\n* .add(f): adds a callback for function f, return value: f\n* .isDone(f): notes one callback completed. returns true if all callbacks complete, otherwise false\n* .getStatus(): gets an object representing the current state\n\n# Examples\n\nTODO\n\n# Notes\n\n(c) [Harald Rudell](http://www.haraldrudell.com) wrote this for node in September, 2012\n\nNo warranty expressed or implied. Use at your own risk.\n\nPlease suggest better ways, new features, and possible difficulties on [github](https://github.com/haraldrudell/apprunner)',
+101 silly publish   _id: 'apprunner@0.0.0',
+101 silly publish   dist: { shasum: 'fb7cd59be53252eba2f69dafc1a67aeea702d8e0' } }
+102 error Error: This package has been marked as private
+102 error Remove the 'private' field from the package.json to publish it.
+102 error     at publish_ (/usr/local/lib/node_modules/npm/lib/publish.js:75:31)
+102 error     at Array.1 (/usr/local/lib/node_modules/npm/node_modules/slide/lib/bind-actor.js:15:8)
+102 error     at LOOP (/usr/local/lib/node_modules/npm/node_modules/slide/lib/chain.js:15:14)
+102 error     at LOOP (/usr/local/lib/node_modules/npm/node_modules/slide/lib/chain.js:14:28)
+102 error     at chain (/usr/local/lib/node_modules/npm/node_modules/slide/lib/chain.js:20:5)
+102 error     at /usr/local/lib/node_modules/npm/lib/publish.js:54:5
+102 error     at /usr/local/lib/node_modules/npm/lib/cache.js:634:14
+102 error     at exports.unlock (/usr/local/lib/node_modules/npm/node_modules/lockfile/lockfile.js:36:7)
+102 error     at fs.close (/usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:92:5)
+102 error     at Object.oncomplete (fs.js:297:15)
+103 error If you need help, you may report this log at:
+103 error     <http://github.com/isaacs/npm/issues>
+103 error or email it to:
+103 error     <npm-@googlegroups.com>
+104 error System Linux 3.2.0-31-generic
+105 error command "/usr/local/bin/node" "/usr/local/bin/npm" "publish"
+106 error cwd /home/foxyboy/Desktop/c505/node/apprunner
+107 error node -v v0.8.6
+108 error npm -v 1.1.48
+109 verbose exit [ 1, true ]
