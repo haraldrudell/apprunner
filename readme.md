@@ -11,6 +11,16 @@ Why App Runner? App Runner is App Lego.
 
 If you make many Web apps and you have several of them for example accessing Facebook or using the same type of database, App Runner enables you to architect that in a repeatable pattern. App Runner allows you to use json to configure where code comes from and its settings.
 
+## Benefits
+
+1. Load of a module now has callback and can signal load error.
+2. Each module (api) can have its location and configuration defined in json.
+3. Large volumes of errors can be emitted and properly communicated.
+4. Reported errors does not kill the app or affect its execution.
+5. Each api can register uri routes, but does not depend on a particular Web server.
+6. Unhandled exceptions are communicated similar to errors.
+7. SIGINT signal gracefully shuts down the application.
+
 # Reference
 
 App Runner handles process exceptions and SIGINT.
