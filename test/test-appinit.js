@@ -4,7 +4,6 @@
 var appinit = require('../lib/appinit')
 var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
-var apimanager = require('../lib/apimanager')
 
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
@@ -12,7 +11,6 @@ var assert = require('mochawrapper')
 var _log = console.log
 var _asi = appshutdown.init
 var _ai = anomaly.initAnomaly
-var _api = apimanager.initApi
 
 exports['App Runner:'] = {
 	'Init App': function (done) {
@@ -21,6 +19,7 @@ exports['App Runner:'] = {
 		var appShutdownInits = 0
 		var app = {
 			on: mockAppOn,
+			get: function () {},
 		}
 		var logger = 3
 		var sendMail = 5
@@ -32,6 +31,7 @@ exports['App Runner:'] = {
 				ops: {
 					sendMail: sendMail,
 				},
+				appFolder: true
 			},
 			api: true,
 		}
@@ -39,13 +39,10 @@ exports['App Runner:'] = {
 		var eInitAnomaly = [[anomalyOpts, sendMail, logger]]
 		var aAppOn = []
 		var eAppOn = ['error']
-		var aApiManagerInitApi = []
-		var eApiManagerInitApi = [[defaults, app]]
 
 		console.log = mockConsoleLog
 		appshutdown.init = mockAppShutdownInit
 		anomaly.initAnomaly = mockInitAnomaly
-		apimanager.initApi = mockApiManagerInitApi
 
 		appinit.initApp(defaults, app, callback)
 
@@ -54,7 +51,6 @@ exports['App Runner:'] = {
 			if (err) assert.equal(err, null)
 			assert.deepEqual(aAppOn, eAppOn, 'app.on invocations')
 			assert.deepEqual(aInitAnomaly, eInitAnomaly, 'Anomaly invocations')
-			assert.deepEqual(aApiManagerInitApi, eApiManagerInitApi, 'Api Manager invocations')
 			assert.equal(consoleLogs, 1, 'Console invocations')
 			assert.equal(appShutdownInits, 1, 'App Shutdown Init invocations')
 			
@@ -74,16 +70,10 @@ exports['App Runner:'] = {
 		function mockInitAnomaly(opts, mail, logger) {
 			aInitAnomaly.push([opts, mail, logger])
 		}
-		function mockApiManagerInitApi(opts, app, errorListener, cb) {
-			assert.equal(typeof errorListener, 'function')
-			aApiManagerInitApi.push([opts, app])
-			cb()
-		}
 	},
 	'after': function () {
 		console.log = _log
 		appshutdown.init = _asi
 		anomaly.initAnomaly = _ai
-		apimanager.initApi = _api
 	}
 }

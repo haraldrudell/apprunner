@@ -3,7 +3,7 @@
 App Runner allows to to generate and maintain many apps using shared code. Require is great, App Runner is greater!
 
 App Runner does three things:
-* Provides loadable apis
+* Provides api control in json
 * Manages application errors
 * Emails anomaly reports
 
@@ -13,12 +13,13 @@ If you make many Web apps and you have several of them for example accessing Fac
 
 ## Benefits
 
-1. Load of a module now has callback and can signal load error.
-2. Each module (api) can have its location and configuration defined in json.
-3. Large volumes of errors can be emitted and properly communicated.
+1. Apis can be moved between project files and external modules with no code change.
+2. One or many apis per file or module.
+2. Configuration information provided to apis from code and json.
+3. Apis can emit large volumes of errors that is properly communicated.
 4. Reported errors does not kill the app or affect its execution.
-5. Each api can register uri routes, but does not depend on a particular Web server.
-6. Unhandled exceptions are communicated similar to errors.
+5. Each api can register uri routes, but does not depend on a particular Web server imlementation.
+6. Unhandled process exceptions are communicated similarly to errors.
 7. SIGINT signal gracefully shuts down the application.
 
 # Reference

@@ -16,7 +16,7 @@ var _ae = apperror.apiError
 exports['App Shutdown:'] = {
 	'Init': function () {
 		var aOns = []
-		var eOns = ['uncaughtException', 'SIGINT']
+		var eOns = ['uncaughtException', 'SIGINT', 'SIGUSR2']
 
 		process.on = mockOn
 

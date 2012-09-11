@@ -35,27 +35,23 @@ function errorListener() {
 }
 
 exports['API Manager:'] = {
-	'Init Api': function (done) {
+	'Init Api': function () {
 		var consoleLogs = 0
 		var aInitApi = []
 
 		console.log = mockConsoleLog
 		require('./apiFolder/apinull').setInitApi(mockInitApi)
 
-		var actual = apimanager.initApi(defaults, app, errorListener, callback)
+		var actual = apimanager.initApi(defaults, app, errorListener)
+		console.log = _log
+		assert.equal(typeof actual, 'object')
+		assert.equal(typeof actual.emit, 'function')
+		assert.equal(consoleLogs, 1, 'Console.log invocations')
 
-		function callback(err) {
-			console.log = _log
-			assert.ok(!err)
-			assert.equal(typeof actual, 'object')
-			assert.equal(typeof actual.emit, 'function')
-
-			done()
-		}
 		function mockConsoleLog(a) {
 			consoleLogs++
 		}
-		function mockInitApi(opts, cb) {
+		function mockInitApi(opts) {
 //console.error(arguments.callee.name, opts)
 			assert.equal(typeof opts, 'object')
 			assert.equal(typeof opts.config, 'object')
@@ -63,9 +59,7 @@ exports['API Manager:'] = {
 			assert.equal(typeof opts.getApi, 'function')
 			assert.equal(typeof opts.logger, 'function')
 			assert.equal(Object.keys(opts).length, 4)
-			assert.equal(typeof cb, 'function')
 			aInitApi.push(opts.config)
-			cb()
 		}
 	},
 	'after': function () {
@@ -73,39 +67,31 @@ exports['API Manager:'] = {
 	}
 
 }
-/*
+
 exports['API Manager Get Api:'] = {
-	'before': function (done) {
+	'before': function () {
 		console.log = function () {}
-		apimanager.initApi(defaults, app, errorListener, callback)
-		function callback(err) {
-			console.log = _log
-			if (err) throw err
-			done()
-		}
+		apimanager.initApi(defaults, app, errorListener)
+		console.log = _log
 	},
-	'Invocation': function (done) {
-		apitest.setApi(initApi)
+	'Invocation': function () {
 		var value = 5
 		var config = {api: 'apitest'}
-		apimanager.getApi(config, getApiResult)
 
-		function getApiResult(err, module) {
-			if (err) assert.equal(err, null)
-			assert.equal(module, value)
+		apitest.setApi(initApi)
 
-			done()
-		}
+		var actual = apimanager.getApi(config)
+		assert.equal(actual, value)
 
 		// invoked when apimanager load apitest
-		function initApi(opts, cb) {
+		function initApi(opts) {
 			assert.equal(typeof opts, 'object', 'opts type')
 			assert.equal(typeof opts.logger, 'function', 'opts.logger')
 			assert.deepEqual(opts.config, config, 'opts.config')
 			assert.equal(typeof opts.registerHandler, 'function', 'opts.registerHandler')
 			assert.equal(typeof opts.getApi, 'function', 'opts.getApi')
 			assert.equal(Object.keys(opts).length, 4, 'opts length')
-			cb(null, value)
+			return value
 		}
 	},
-}*/
+}

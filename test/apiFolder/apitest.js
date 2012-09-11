@@ -6,7 +6,7 @@ exports.setApi = setApi
 var api
 
 function initApi() {
-	api.apply(this, Array.prototype.slice.call(arguments))
+	return api.apply(this, Array.prototype.slice.call(arguments))
 }
 
 function setApi(f) {
