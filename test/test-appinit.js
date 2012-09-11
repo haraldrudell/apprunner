@@ -51,7 +51,7 @@ exports['App Runner:'] = {
 			if (err) assert.equal(err, null)
 			assert.deepEqual(aAppOn, eAppOn, 'app.on invocations')
 			assert.deepEqual(aInitAnomaly, eInitAnomaly, 'Anomaly invocations')
-			assert.equal(consoleLogs, 1, 'Console invocations')
+			assert.equal(consoleLogs, 2, 'Console invocations')
 			assert.equal(appShutdownInits, 1, 'App Shutdown Init invocations')
 			
 			done()

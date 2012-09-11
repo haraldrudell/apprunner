@@ -41,7 +41,7 @@ exports['API Manager:'] = {
 
 		console.log = mockConsoleLog
 		require('./apiFolder/apinull').setInitApi(mockInitApi)
-
+debugger
 		var actual = apimanager.initApi(defaults, app, errorListener)
 		console.log = _log
 		assert.equal(typeof actual, 'object')
@@ -77,11 +77,15 @@ exports['API Manager Get Api:'] = {
 	'Invocation': function () {
 		var value = 5
 		var config = {api: 'apitest'}
+		var consoleLogs = 0
 
 		apitest.setApi(initApi)
+		console.log = mockConsoleLog
 
 		var actual = apimanager.getApi(config)
+		console.log = _log
 		assert.equal(actual, value)
+		assert.equal(consoleLogs, 1)
 
 		// invoked when apimanager load apitest
 		function initApi(opts) {
@@ -93,5 +97,11 @@ exports['API Manager Get Api:'] = {
 			assert.equal(Object.keys(opts).length, 4, 'opts length')
 			return value
 		}
+		function mockConsoleLog(a) {
+			consoleLogs++
+		}
 	},
+	'after': function () {
+		console.log = _log
+	}
 }

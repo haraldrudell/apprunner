@@ -48,9 +48,16 @@ get an api implementation
 * .api: string: name of api function to be loaded
 * cb(err, module)
 
-APIs are either configured directly in opts, or in defaults provided at App Runner init
+APIs are either configured directly in opts, or in defaults provided at App Runner init.
 
-If module has module.emitter, APp Runner will listen and manage error events
+Settings either in json or in opts:
+* .file specifies basic require, default is './' + .api
+* if basic require begins with '.' it is resolved agains appFolder/lib or defaults.api.folder
+* .subPath is period-separated paths in the loaded module, default none
+* .apiExport is the export used to initialize
+* if function, it is invoked, and the module result is its return value
+* if value, it is used as an error emitter, return value is module.subPath
+* if false, module.subPath is returned
 
 ## anomaly(...)
 
