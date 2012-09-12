@@ -122,7 +122,11 @@ cbc: object
 
 Configurations for an api is provided either in defaults or in the opts
 
+## Retrieving an api
+
 As a minimum, the opts object needs to contain the api property: `getApi({api: 'userstore'})`
+
+## How the api is loaded
 
 An Api's location is determined by two properties:
 
@@ -130,15 +134,31 @@ An Api's location is determined by two properties:
 2. .subPath: dot-separated property access inside the module loaded by require
 
 If file is missing some special steps are taken:
-3. If file is missing, the default filename is the api name.
-4. defaults.api.folder can provide a default folder used if file begings with '.' or is missing
-5. If no folder is provided, the lib folder in appFolder is used.
+
+1. If file is missing, the default filename is the api name.
+2. defaults.api.folder can provide a default folder used if file begings with '.' or is missing
+3. If no folder is provided, the lib folder in appFolder is used.
+
+## The api module
 
 The api module itself can have four optional special exports:
 * initApi(opts): code executed on the first load of the api processing the options. May return a value that is used in place of the regular module value
 * apiReady(cb(err)) calls back when the api is ready to provide service
 * endApi(cb(err)) instructs the api to shut down, ie. close connections and clear timers
 * emitter if this is an EventEmitter, errors emitted are processed as anomalies
+
+## Execution of initApi
+
+if your api exports initApi, ths function is invoked on each require. This is because options may change, and you need to take this in account.
+
+initApi is provided an options object:
+
+* .config: object: the merge of options providing to getApi and options in apiMap. getApi options overrride
+* .registerHandler(string route, handler(req, res, next)): registers a route with whatever Web server is used. 
+* .logger: function(string): the logging to be used
+* .apprunner: object: the apprunner module for convenience
+
+if initApi returns a value, this is used as the result of getApi().
 
 # Examples
 

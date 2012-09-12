@@ -37,7 +37,11 @@ function errorListener() {
 exports['API Manager:'] = {
 	'Init Api': function () {
 		var consoleLogs = 0
-		var aInitApi = []
+		var eConfig = {
+			onLoad:true,
+			api:'apinull'
+		}
+
 
 		console.log = mockConsoleLog
 		require('./apiFolder/apinull').setInitApi(mockInitApi)
@@ -52,12 +56,12 @@ exports['API Manager:'] = {
 		function mockInitApi(opts) {
 //console.error(arguments.callee.name, opts)
 			assert.equal(typeof opts, 'object')
-			assert.equal(typeof opts.config, 'object')
+			assert.deepEqual(opts.config, eConfig)
 			assert.equal(typeof opts.registerHandler, 'function')
-			assert.equal(typeof opts.getApi, 'function')
+			assert.equal(typeof opts.apprunner, 'object')
+			assert.equal(typeof opts.apprunner.getApi, 'function')
 			assert.equal(typeof opts.logger, 'function')
 			assert.equal(Object.keys(opts).length, 4)
-			aInitApi.push(opts.config)
 		}
 	},
 	'before': function () {
@@ -74,6 +78,9 @@ exports['API Manager Get Api:'] = {
 		var value = 5
 		var config = {api: 'apitest'}
 		var consoleLogs = 0
+		var eConfig = {
+			api: 'apitest'
+		}
 
 		apitest.setApi(initApi)
 		console.log = mockConsoleLog
@@ -84,12 +91,13 @@ exports['API Manager Get Api:'] = {
 
 		// invoked when apimanager load apitest
 		function initApi(opts) {
-			assert.equal(typeof opts, 'object', 'opts type')
-			assert.equal(typeof opts.logger, 'function', 'opts.logger')
-			assert.deepEqual(opts.config, config, 'opts.config')
-			assert.equal(typeof opts.registerHandler, 'function', 'opts.registerHandler')
-			assert.equal(typeof opts.getApi, 'function', 'opts.getApi')
-			assert.equal(Object.keys(opts).length, 4, 'opts length')
+			assert.equal(typeof opts, 'object')
+			assert.deepEqual(opts.config, eConfig)
+			assert.equal(typeof opts.registerHandler, 'function')
+			assert.equal(typeof opts.apprunner, 'object')
+			assert.equal(typeof opts.apprunner.getApi, 'function')
+			assert.equal(typeof opts.logger, 'function')
+			assert.equal(Object.keys(opts).length, 4)
 			return value
 		}
 		function mockConsoleLog(a) {
