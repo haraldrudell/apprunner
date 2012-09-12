@@ -41,11 +41,9 @@ exports['API Manager:'] = {
 
 		console.log = mockConsoleLog
 		require('./apiFolder/apinull').setInitApi(mockInitApi)
-debugger
-		var actual = apimanager.initApi(defaults, app, errorListener)
+
+		apimanager.initApi(defaults, app)
 		console.log = _log
-		assert.equal(typeof actual, 'object')
-		assert.equal(typeof actual.emit, 'function')
 		assert.equal(consoleLogs, 1, 'Console.log invocations')
 
 		function mockConsoleLog(a) {
@@ -62,6 +60,9 @@ debugger
 			aInitApi.push(opts.config)
 		}
 	},
+	'before': function () {
+		apimanager.testReset()
+	},
 	'after': function () {
 		console.log = _log
 	}
@@ -69,11 +70,6 @@ debugger
 }
 
 exports['API Manager Get Api:'] = {
-	'before': function () {
-		console.log = function () {}
-		apimanager.initApi(defaults, app, errorListener)
-		console.log = _log
-	},
 	'Invocation': function () {
 		var value = 5
 		var config = {api: 'apitest'}
@@ -82,10 +78,9 @@ exports['API Manager Get Api:'] = {
 		apitest.setApi(initApi)
 		console.log = mockConsoleLog
 
-		var actual = apimanager.getApi(config)
+		apimanager.getApi(config)
 		console.log = _log
-		assert.equal(actual, value)
-		assert.equal(consoleLogs, 1)
+		assert.equal(consoleLogs, 0)
 
 		// invoked when apimanager load apitest
 		function initApi(opts) {
@@ -100,6 +95,12 @@ exports['API Manager Get Api:'] = {
 		function mockConsoleLog(a) {
 			consoleLogs++
 		}
+	},
+	'before': function () {
+		apimanager.testReset()
+		console.log = function () {}
+		apimanager.initApi(defaults, app, errorListener)
+		console.log = _log
 	},
 	'after': function () {
 		console.log = _log

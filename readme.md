@@ -3,13 +3,13 @@
 App Runner allows to to generate and maintain many apps using shared code. Require is great, App Runner is greater!
 
 App Runner does three things:
-* Provides api control in json
-* Manages application errors
-* Emails anomaly reports
+* Provides module control from json
+* Manages application errors and reporting
+* Handle lifecycle of the app and its modules
 
 Why App Runner? App Runner is App Lego.
 
-If you make many Web apps and you have several of them for example accessing Facebook or using the same type of database, App Runner enables you to architect that in a repeatable pattern. App Runner allows you to use json to configure where code comes from and its settings.
+If you make many Web apps for example accessing Facebook or the same database, App Runner enables you to architect in a repeatable pattern. App Runner allows you to use json to configure where code comes from and its settings.
 
 ## Benefits
 
@@ -18,9 +18,10 @@ If you make many Web apps and you have several of them for example accessing Fac
 2. Configuration information provided to apis from code and json.
 3. Apis can emit large volumes of errors that is properly communicated.
 4. Reported errors does not kill the app or affect its execution.
-5. Each api can register uri routes, but does not depend on a particular Web server imlementation.
+5. Each api can register uri routes, but does not depend on a particular Web server implementation.
 6. Unhandled process exceptions are communicated similarly to errors.
 7. SIGINT signal gracefully shuts down the application.
+8. Apis can communciate delayed readiness, and provide shutdown hooks
 
 # Reference
 
@@ -28,7 +29,7 @@ App Runner handles process exceptions and SIGINT.
 * Exit code 0 is SIGINT
 * Exit code 2 is unhandled exception
 
-## initApp(defaults, app, cb)
+## initApp(defaults, app)
 
 * defaults: options, typically loaded by haraldops
 
@@ -36,28 +37,33 @@ App Runner handles process exceptions and SIGINT.
   * .init.logger: optional function(string): logging, default console.log
   * .init.ops.sendMail: optional function(subject, body): Sends mail, default none
   * .api: optional, indicates that Api Manager should be used
-  * .api.apiMap: api configurations
+  * .api.apiMap: optional: api configurations
 
-* app: Web server, has .on and .get methods
-* cb(err): optional function
+* app: Web server, could be an event emitter and have a .get method
 
-## getApi(opts, cb)
+## getApi(opts)
 
-get an api implementation
+Example of using a proprietary serverhelp api, that manages Express lifecycle as an api.
+
+```js
+require('apprunner')
+	.getApi({api: 'serverhelp'})
+	.listen({
+		server: app,
+		port: defaults.PORT,
+		interface: defaults.appInterface},
+	cbc.add(appIsUp))
+```
+
+gets an api implementation
 * opts: object
 * .api: string: name of api function to be loaded
-* cb(err, module)
 
-APIs are either configured directly in opts, or in defaults provided at App Runner init.
+APIs are either configured directly in the opts object, or in defaults provided at App Runner's init.
 
-Settings either in json or in opts:
-* .file specifies basic require, default is './' + .api
-* if basic require begins with '.' it is resolved agains appFolder/lib or defaults.api.folder
-* .subPath is period-separated paths in the loaded module, default none
-* .apiExport is the export used to initialize
-* if function, it is invoked, and the module result is its return value
-* if value, it is used as an error emitter, return value is module.subPath
-* if false, module.subPath is returned
+## apisReady(cb)
+
+Surveys all loaded apis to see if they have concluded initializing. Each api can expose an apiReady(cb) function used fo this purpose.
 
 ## anomaly(...)
 
@@ -67,11 +73,23 @@ Report any argument as an anomaly, to the log and if so configured a periodcal e
 
 control emailing on or off: flag: boolean, default: false
 
+## addErrorListener(emitter)
+
+Adds an error listener to the EventEmitter. Safe: can be invoked with any value, or repeatedly invoked.
+
+## removeErrorListener(emitter)
+
+Removes an error listener to the EventEmitter. Safe: can be invoked with any value, or repeatedly invoked.
+
+## shutdown(exitCode)
+
+Shuts the application down. All apis that have exposed an endApi function gets this invoked prior to process.exit
+
 ## getCbCounter()
 Ensures that all callbacks has completed
 
 ```js
-var haraldutil = require('haraldutil')
+var apprunner = require('apprunner')
 var cbc = haraldutil.getCbCounter()
 setTimeout(cbc.add(callback), 100)
 setTimeout(cbc.add(callback), 100)
@@ -99,6 +117,28 @@ cbc: object
 * .add(f): adds a callback for function f, return value: f
 * .isDone(f): notes one callback completed. returns true if all callbacks complete, otherwise false
 * .getStatus(): gets an object representing the current state
+
+# Configuring and Writing an Api Module
+
+Configurations for an api is provided either in defaults or in the opts
+
+As a minimum, the opts object needs to contain the api property: `getApi({api: 'userstore'})`
+
+An Api's location is determined by two properties:
+
+1. .file: the same value you would provide to require
+2. .subPath: dot-separated property access inside the module loaded by require
+
+If file is missing some special steps are taken:
+3. If file is missing, the default filename is the api name.
+4. defaults.api.folder can provide a default folder used if file begings with '.' or is missing
+5. If no folder is provided, the lib folder in appFolder is used.
+
+The api module itself can have four optional special exports:
+* initApi(opts): code executed on the first load of the api processing the options. May return a value that is used in place of the regular module value
+* apiReady(cb(err)) calls back when the api is ready to provide service
+* endApi(cb(err)) instructs the api to shut down, ie. close connections and clear timers
+* emitter if this is an EventEmitter, errors emitted are processed as anomalies
 
 # Examples
 
