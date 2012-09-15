@@ -5,12 +5,17 @@ var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
+// http://nodejs.org/api/fs.html
+var fs = require('fs')
+// http://nodejs.org/api/path.html
+var path = require('path')
 
 var _log = console.log
 var _exit = process.exit
 var _on = process.on
 var _ad = anomaly.anomalyDown
 var an = anomaly.anomaly
+var wf = fs.writeFile
 
 exports['App Shutdown:'] = {
 	'Init': function () {
@@ -114,11 +119,44 @@ exports['App Shutdown:'] = {
 			}
 		}
 	},
+	'SIGUSR2': function () {
+		var defaults = {
+			init: {tmpFolder: 'TMP'},
+			PORT: 'port',
+			URL: 'url',
+		}
+		var aWfs = []
+
+		var sigIntHandler = getHandler('SIGUSR2')
+
+		fs.writeFile = mockWriteFile
+		sigIntHandler()
+		assert.equal(aWfs.length, 1)
+		var eFile = path.join(defaults.init.tmpFolder, process.pid + '.json')
+		assert.equal(aWfs[0][0], eFile)
+		var eData = JSON.stringify({PORT: defaults.PORT, URL: defaults.URL})
+		assert.equal(aWfs[0][1], eData)
+
+		function mockWriteFile(file, data, cb) {
+			aWfs.push([file, data])
+			cb()
+		}
+		function getHandler(signal) {
+			var handler
+			process.on = mockOn
+			appshutdown.init(defaults)
+			return handler
+			function mockOn(event, handler0) {
+				if (event == signal) handler = handler0
+			}
+		}
+	},
 	'after': function () {
 		console.log = _log
 		process.exit = _exit
 		process.on = _on
 		anomaly.anomalyDown = _ad
 		anomaly.anomaly = an
+		fs.writeFile = wf
 	}
 }

@@ -1,4 +1,4 @@
-// test-rqs2.js
+// test-rqs.js
 // © Harald Rudell 2012
 
 var rqs = require('../lib/rqs')
@@ -86,8 +86,8 @@ exports['Request Timer Factory:'] = {
 	'scopeName and .isTimeout()': function (done) {
 		var aECbs = []
 		var scope = 'SCOPE'
-		var time = 100
-		var moreTime = time + 1
+		var time = 100 // the minimum value rqs allow
+		var moreTime = time + 10
 		var factory = rqs.getRqs(errorCallback, scope, time)
 
 		// scope only shows up in errors
