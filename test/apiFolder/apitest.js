@@ -1,5 +1,9 @@
 // apitest.js
 
+var emitter = new (require('events').EventEmitter)
+emitter.id = 'Api Test'
+
+exports.emitter = emitter
 exports.initApi = initApi
 exports.setApi = setApi
 

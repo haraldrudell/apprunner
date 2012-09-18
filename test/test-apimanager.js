@@ -31,7 +31,7 @@ function appGet() {
 	throw Error()
 }
 function errorListener() {
-	throw Error()
+	throw Error(Array.prototype.slice.call(arguments))
 }
 
 exports['API Manager:'] = {
@@ -61,7 +61,7 @@ exports['API Manager:'] = {
 			assert.equal(typeof opts.apprunner, 'object')
 			assert.equal(typeof opts.apprunner.getApi, 'function')
 			assert.equal(typeof opts.logger, 'function')
-			assert.equal(Object.keys(opts).length, 4)
+			assert.equal(Object.keys(opts).length, 5)
 		}
 	},
 	'before': function () {
@@ -91,13 +91,6 @@ exports['API Manager Get Api:'] = {
 
 		// invoked when apimanager load apitest
 		function initApi(opts) {
-			assert.equal(typeof opts, 'object')
-			assert.deepEqual(opts.config, eConfig)
-			assert.equal(typeof opts.registerHandler, 'function')
-			assert.equal(typeof opts.apprunner, 'object')
-			assert.equal(typeof opts.apprunner.getApi, 'function')
-			assert.equal(typeof opts.logger, 'function')
-			assert.equal(Object.keys(opts).length, 4)
 			return value
 		}
 		function mockConsoleLog(a) {
@@ -107,7 +100,7 @@ exports['API Manager Get Api:'] = {
 	'before': function () {
 		apimanager.testReset()
 		console.log = function () {}
-		apimanager.initApi(defaults, app, errorListener)
+		apimanager.initApi(defaults, app)
 		console.log = _log
 	},
 	'after': function () {

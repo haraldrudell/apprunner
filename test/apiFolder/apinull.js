@@ -2,6 +2,10 @@
 // test api manager onLoad
 // © Harald Rudell 2012
 
+var emitter = new (require('events').EventEmitter)
+emitter.id = 'Api Null'
+
+exports.emitter = emitter
 exports.initApi = initApi
 exports.setInitApi = setInitApi
 

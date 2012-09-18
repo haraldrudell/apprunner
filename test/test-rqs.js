@@ -8,12 +8,13 @@ var defTime = 100 // 100 ms
 var moreThanDefTime = defTime + 10 // 110 ms
 var longTime = 1e5 // 100 seconds
 
+var els = rqs.emitter.listeners('error')
+
 var errors = []
 function errorListener(err) {
 	errors.push(err)
 }
 var filemarker = 'file: ' + __filename.substring(__filename.lastIndexOf('/') + 1)
-
 exports['Request Timer Factory:'] = {
 	'Plain Invocation': function () {
 		assert.equal(errors.length, 0, 'No errors before test')
@@ -116,10 +117,14 @@ exports['Request Timer Factory:'] = {
 		}
 	},
 	'before': function () {
+		rqs.emitter.removeAllListeners('error')
 		rqs.emitter.addListener('error', errorListener)
 	},
 	'after': function () {
-		rqs.emitter.removeListener('error', errorListener)
+		rqs.emitter.removeAllListeners('error')
+		els.forEach(function (listener) {
+			rqs.emitter.addListener('error', listener)
+		})
 	},
 }
 
@@ -215,9 +220,13 @@ exports['Request Timer Instance:'] = {
 		}
 	},
 	'before': function () {
+		rqs.emitter.removeAllListeners('error')
 		rqs.emitter.addListener('error', errorListener)
 	},
 	'after': function () {
-		rqs.emitter.removeListener('error', errorListener)
+		rqs.emitter.removeAllListeners('error')
+		els.forEach(function (listener) {
+			rqs.emitter.addListener('error', listener)
+		})
 	},
 }
