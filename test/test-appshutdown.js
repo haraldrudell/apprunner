@@ -51,7 +51,7 @@ exports['App Shutdown:'] = {
 		sigIntHandler()
 		console.log = _log
 		assert.deepEqual(aExits, eExits, 'Incorrect exitCode')
-		assert.equal(logs, 4, 'Console.log invocation count')
+		assert.equal(logs, 5, 'Console.log invocation count')
 		assert.equal(downs, 1)
 
 		function mockExit(exitCode) {
@@ -93,7 +93,7 @@ exports['App Shutdown:'] = {
 		console.log = _log
 		assert.deepEqual(aExits, eExits)
 		assert.equal(errors, 1)
-		assert.equal(logs, 4, 'Console.log invocations')
+		assert.equal(logs, 5, 'Console.log invocations')
 		assert.equal(downs, 1)
 
 		function mockExit(exitCode) {
