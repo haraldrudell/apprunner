@@ -1,27 +1,27 @@
 # App Runner
 
-App Runner allows to to generate and maintain many apps using shared code. Require is great, App Runner is greater!
-
-App Runner does three things:
-* Provides module control from json
-* Manages application errors and reporting
-* Handle lifecycle of the app and its modules
-
-Why App Runner? App Runner is App Lego.
-
-If you make many Web apps for example accessing Facebook or the same database, App Runner enables you to architect in a repeatable pattern. App Runner allows you to use json to configure where code comes from and its settings.
+App Runner manages app execution and error reporting as well as a unified way of separate and reuse modules. Require is great, App Runner is greater!
 
 ## Benefits
 
-1. Apis can be moved between project files and external modules with no code change.
-2. One or many apis per file or module.
-2. Configuration information provided to apis from code and json.
-3. Apis can emit large volumes of errors that is properly communicated.
-4. Reported errors does not kill the app or affect its execution.
-5. Each api can register uri routes, but does not depend on a particular Web server implementation.
-6. Unhandled process exceptions are communicated similarly to errors.
-7. SIGINT signal gracefully shuts down the application.
-8. Apis can communciate delayed readiness, and provide shutdown hooks
+1. Move apis between project files and external modules with no code change, or switch implementation for a given api name
+2. Implement one or many apis per file or module.
+2. Configure apis per invocation or using json at launch.
+3. Find root causes by collecting large volumes of elaborate error reports featuring multiple stack traces, variable values and any other useful information.
+4. Continue best effort execution after error reports.
+5. Server flexibility: apis can register uri routes, but do not depend on a particular Web server implementation.
+6. Unhandled process exceptions captures elaborate error reports and gracefully terminates the application.
+7. Gracefully shut down the application on demand using SIGINT signal from keyboard Ctrl-Break or another process
+8. Graceful launch using api delayed readiness hook
+9. Graceful exits using api shutdown hook
+9. Track performance of external interfaces using invocation timers
+
+## Features
+
+1. Provides module control from json
+2. Manages application error reports and queues
+3. Lifecycle management of the app and its modules
+5. Single-module exposure of the entire app to the launch script
 
 # Reference
 
