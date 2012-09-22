@@ -1,19 +1,19 @@
 # App Runner
 
-App Runner manages app execution and error reporting as well as a unified way of separate and reuse modules. Require is great, App Runner is greater!
+App Runner manages app execution and error reporting and provides a unified way to separate and reuse modules. Require is great, App Runner is greater!
 
 ## Benefits
 
 1. Move apis between project files and external modules with no code change, or switch implementation for a given api name
 2. Implement one or many apis per file or module.
-2. Configure apis per invocation or using json at launch.
+2. Configure apis both per invocation and json at launch.
 3. Find root causes by collecting large volumes of elaborate error reports featuring multiple stack traces, variable values and any other useful information.
-4. Continue best effort execution after error reports.
+4. Continue best effort execution after error reporting.
 5. Server flexibility: apis can register uri routes, but do not depend on a particular Web server implementation.
-6. Unhandled process exceptions captures elaborate error reports and gracefully terminates the application.
+6. Gracefully terminate after unhandled process exceptions capturing elaborate error reports.
 7. Gracefully shut down the application on demand using SIGINT signal from keyboard Ctrl-Break or another process
-8. Graceful launch using api delayed readiness hook
-9. Graceful exits using api shutdown hook
+8. Gracefully launch using api delayed readiness hook
+9. Gracefully exit using api shutdown hook
 9. Track performance of external interfaces using invocation timers
 
 ## Features
