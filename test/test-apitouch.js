@@ -17,7 +17,6 @@ exports['Api Touch:'] = {
 		var emitter = {id: 'ID'}
 		apitouch.testReset()
 		apitouch.setEmitter(emitter, apis)
-debugger
 		apitouch.apisReady(result)
 
 		function result(err) {
