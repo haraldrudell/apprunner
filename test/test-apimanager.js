@@ -46,7 +46,7 @@ exports['API Manager:'] = {
 		console.log = mockConsoleLog
 		require('./apiFolder/apinull').setInitApi(mockInitApi)
 
-		apimanager.initApi(defaults, app)
+		apimanager.initApi(defaults)
 		console.log = _log
 		assert.equal(consoleLogs, 1, 'Console.log invocations')
 
@@ -100,7 +100,7 @@ exports['API Manager Get Api:'] = {
 	'before': function () {
 		apimanager.testReset()
 		console.log = function () {}
-		apimanager.initApi(defaults, app)
+		apimanager.initApi(defaults)
 		console.log = _log
 	},
 	'after': function () {
