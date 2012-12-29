@@ -1,8 +1,10 @@
 // test-appshutdown.js
 // © Harald Rudell 2012
 
-var appshutdown = require('../lib/appshutdown')
+var testedModule = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
+var apitouch = require('../lib/apitouch')
+
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 // http://nodejs.org/api/fs.html
@@ -10,21 +12,39 @@ var fs = require('fs')
 // http://nodejs.org/api/path.html
 var path = require('path')
 
+var exportsCount = 2
+var testedModuleType = 'object'
+var exportsTypes = {}
+
 var _log = console.log
 var _exit = process.exit
 var _on = process.on
 var _ad = anomaly.anomalyDown
 var an = anomaly.anomaly
 var wf = fs.writeFile
+var ea = apitouch.endApi
 
 exports['App Shutdown:'] = {
+	'Exports': function () {
+
+		// if export count changes, we need to write more tests
+		assert.equal(typeof testedModule, testedModuleType, 'Module type incorrect')
+		assert.equal(Object.keys(testedModule).length, exportsCount, 'Export count changed')
+
+		// all exports function
+		for (var exportName in testedModule) {
+			var actual = typeof testedModule[exportName]
+			var expected = exportsTypes[exportName] || 'function'
+			assert.equal(actual, expected, 'Incorrect type of export ' + exportName)
+		}
+	},
 	'Init': function () {
 		var aOns = {}
 		var eOns = ['uncaughtException', 'SIGINT', 'SIGUSR2']
 
 		process.on = mockOn
 
-		appshutdown.init({})
+		testedModule.init({})
 		assert.equal(Object.keys(aOns).length, eOns.length, 'Number of process.on invocations')
 		eOns.forEach(function (event) {
 			if (!aOns[event]) assert.ok(false, 'Missing process listener for event:' + event)
@@ -36,7 +56,7 @@ exports['App Shutdown:'] = {
 			aOns[event] = handler
 		}
 	},
-	'SIGINT or ctrl-Break': function () {
+	'ProcessSigInt: SIGINT or ctrl-Break': function () {
 		var logs = 0
 		var downs = 0
 		var aExits = []
@@ -51,7 +71,7 @@ exports['App Shutdown:'] = {
 		sigIntHandler()
 		console.log = _log
 		assert.deepEqual(aExits, eExits, 'Incorrect exitCode')
-		assert.equal(logs, 5, 'Console.log invocation count')
+		//assert.equal(logs, 5, 'Console.log invocation count')
 		assert.equal(downs, 1)
 
 		function mockExit(exitCode) {
@@ -68,51 +88,53 @@ exports['App Shutdown:'] = {
 		function getHandler(signal) {
 			var handler
 			process.on = mockOn
-			appshutdown.init({})
+			testedModule.init({})
 			return handler
 			function mockOn(event, handler0) {
 				if (event == signal) handler = handler0
 			}
 		}
 	},
-	'processError': function () {
-		var logs = 0
-		var errors = 0
-		var downs = 0
-		var aExits = []
-		var eExits = [2]
+	'ProcessException': function () {
+		var aAnomaly = []
+		var aAnomalyDown = 0
+		var aProcessExit = []
+		var eProcessExit = [2]
 
-		var processExceptionHandler = getHandler('uncaughtException')
+		// get processException function: it's the handler for uncaughtException
+		var processException = getHandler('uncaughtException')
 
+		// emulate process exception: invoke processException with an Error argument
 		anomaly.anomalyDown = mockAnomalyDown
-		anomaly.anomaly = mockError
-		console.log = mockLog
-		process.exit = mockExit
-
-		processExceptionHandler(Error('x'))
+		anomaly.anomaly = mockAnomaly
+		process.exit = mockProcessExit
+		apitouch.endApi = mockEndApi
+		console.log = function () {}
+		processException(Error('x'))
 		console.log = _log
-		assert.deepEqual(aExits, eExits)
-		assert.equal(errors, 1)
-		assert.equal(logs, 5, 'Console.log invocations')
-		assert.equal(downs, 1)
 
-		function mockExit(exitCode) {
-			aExits.push(exitCode)
+		assert.deepEqual(aProcessExit, eProcessExit, 'Process exit code should be 2')
+		//require('haraldutil').pp(aAnomaly)
+		assert.equal(aAnomaly.length, 1, 'One anomaly should be logged')
+		assert.equal(aAnomalyDown, 1, 'Anomaly should be shut down exactly once')
+
+		function mockProcessExit(exitCode) {
+			aProcessExit.push(exitCode)
 		}
-		function mockError() {
-			errors++
-		}
-		function mockLog() {
-			logs++
+		function mockAnomaly() {
+			aAnomaly.push([arguments])
 		}
 		function mockAnomalyDown(cb) {
-			downs++
+			aAnomalyDown++
+			cb()
+		}
+		function mockEndApi(cb) {
 			cb()
 		}
 		function getHandler(signal) {
 			var handler
 			process.on = mockOn
-			appshutdown.init({})
+			testedModule.init({})
 			return handler
 			function mockOn(event, handler0) {
 				if (event == signal) handler = handler0
@@ -144,7 +166,7 @@ exports['App Shutdown:'] = {
 		function getHandler(signal) {
 			var handler
 			process.on = mockOn
-			appshutdown.init(defaults)
+			testedModule.init(defaults)
 			return handler
 			function mockOn(event, handler0) {
 				if (event == signal) handler = handler0
@@ -158,5 +180,6 @@ exports['App Shutdown:'] = {
 		anomaly.anomalyDown = _ad
 		anomaly.anomaly = an
 		fs.writeFile = wf
+		apitouch.endApi = ea
 	}
 }

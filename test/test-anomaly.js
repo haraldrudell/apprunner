@@ -1,33 +1,53 @@
 // test-anomaly.js
 // © Harald Rudell 2012
 
-var anomaly = require('../lib/anomaly')
+var testedModule = require('../lib/anomaly')
+// http://nodejs.org/api/os.html
+var os = require('os')
+
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
+
+var exportsCount = 4
+var testedModuleType = 'object'
+var exportsTypes = {}
 
 var anomalySubject = 'Anomaly Report'
 var anomalyBodyStart = 'Anomaly '
 
 exports['Anomaly:'] = {
-	'Init and Down': function (done) {
-		anomaly.initAnomaly()
-		anomaly.anomalyDown(downResult)
+	'Exports': function () {
+
+		// if export count changes, we need to write more tests
+		assert.equal(typeof testedModule, testedModuleType, 'Module type incorrect')
+		assert.equal(Object.keys(testedModule).length, exportsCount, 'Export count changed')
+
+		// all exports function
+		for (var exportName in testedModule) {
+			var actual = typeof testedModule[exportName]
+			var expected = exportsTypes[exportName] || 'function'
+			assert.equal(actual, expected, 'Incorrect type of export ' + exportName)
+		}
+	},
+	'InitAnomaly AnomalyDown': function (done) {
+		testedModule.initAnomaly()
+		testedModule.anomalyDown(downResult)
 
 		function downResult() {
 			done()
 		}
 	},
-	'Enable Anomaly Mail': function (done) {
+	'EnableAnomalyMail': function (done) {
 		var logs = 0
 		var mails = 0
 
-		anomaly.initAnomaly({}, mockMail, mockLog)
-		anomaly.anomalyDown(downResult)
+		testedModule.initAnomaly({}, mockMail, mockLog)
+		testedModule.anomalyDown(downResult)
 
 		function downResult() {
-			assert.equal(anomaly.enableAnomalyMail(true), true)
+			assert.equal(testedModule.enableAnomalyMail(true), true)
 			assert.equal(logs, 0)
-			assert.equal(anomaly.enableAnomalyMail(false), false)
+			assert.equal(testedModule.enableAnomalyMail(false), false)
 			assert.equal(logs, 1)
 			assert.equal(mails, 0)
 
@@ -49,13 +69,13 @@ exports['Anomaly:'] = {
 		var anomaly2 = 'haha2'
 		var anomaly3 = 'haha3'
 
-		anomaly.initAnomaly({maxBuffer: 1}, mockSendMail, mockLog)
-		anomaly.enableAnomalyMail(true)
+		testedModule.initAnomaly({maxBuffer: 1}, mockSendMail, mockLog)
+		testedModule.enableAnomalyMail(true)
 
 		// first anomaly: immediately sent
-		anomaly.anomaly(anomaly1)
+		testedModule.anomaly(anomaly1)
 		assert.equal(aSendMail.length, 1)
-		assert.equal(aSendMail[0][0], eSubject)
+		assert.equal(aSendMail[0][0], eSubject + ' ' + os.hostname())
 		assert.deepEqual(typeof aSendMail[0][1], 'string')
 		assert.ok(~aSendMail[0][1].indexOf(anomaly1))
 		assert.equal(logs, 1, 'Console.log invocations: each anomaly should be logged')
@@ -64,17 +84,17 @@ exports['Anomaly:'] = {
 		// third anomaly: skipped
 		logs = 0
 		aSendMail = []
-		anomaly.anomaly(anomaly2)
-		anomaly.anomaly(anomaly3)
+		testedModule.anomaly(anomaly2)
+		testedModule.anomaly(anomaly3)
 		assert.equal(aSendMail.length, 0)
 		assert.equal(logs, 2, 'Console.log invocations: each anomaly should be logged')
 
 		// shutDown: should send
-		anomaly.anomalyDown(downResult)
+		testedModule.anomalyDown(downResult)
 
 		function downResult() {
 			assert.equal(aSendMail.length, 1)
-			assert.equal(aSendMail[0][0], eSubject)
+			assert.equal(aSendMail[0][0], eSubject + ' ' + os.hostname())
 			assert.deepEqual(typeof aSendMail[0][1], 'string')
 			assert.ok(~aSendMail[0][1].indexOf(anomaly2))
 			assert.ok(!~aSendMail[0][1].indexOf(anomaly3))
