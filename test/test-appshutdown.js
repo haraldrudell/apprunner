@@ -3,7 +3,8 @@
 
 var testedModule = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
-var apitouch = require('../lib/apitouch')
+var apitouchxx = require('../lib/apitouch-x')
+var apilist = require('../lib/apilist')
 
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
@@ -22,7 +23,8 @@ var _on = process.on
 var _ad = anomaly.anomalyDown
 var an = anomaly.anomaly
 var wf = fs.writeFile
-var ea = apitouch.endApi
+var ea = apitouchxx.endApi
+var iea = apilist.invokeEndApi
 
 exports['App Shutdown:'] = {
 	'Exports': function () {
@@ -100,6 +102,7 @@ exports['App Shutdown:'] = {
 		var aAnomalyDown = 0
 		var aProcessExit = []
 		var eProcessExit = [2]
+		var aEndApi = 0
 
 		// get processException function: it's the handler for uncaughtException
 		var processException = getHandler('uncaughtException')
@@ -108,15 +111,17 @@ exports['App Shutdown:'] = {
 		anomaly.anomalyDown = mockAnomalyDown
 		anomaly.anomaly = mockAnomaly
 		process.exit = mockProcessExit
-		apitouch.endApi = mockEndApi
+		apitouchxx.endApi = mockEndApi
+		apilist.invokeEndApi = mockEndApi
 		console.log = function () {}
 		processException(Error('x'))
 		console.log = _log
 
 		assert.deepEqual(aProcessExit, eProcessExit, 'Process exit code should be 2')
-		//require('haraldutil').pp(aAnomaly)
+		//**require('haraldutil').pp(aAnomaly)
 		assert.equal(aAnomaly.length, 1, 'One anomaly should be logged')
 		assert.equal(aAnomalyDown, 1, 'Anomaly should be shut down exactly once')
+		assert.equal(aEndApi, 2, 'Anomaly should be shut down exactly once')
 
 		function mockProcessExit(exitCode) {
 			aProcessExit.push(exitCode)
@@ -129,6 +134,7 @@ exports['App Shutdown:'] = {
 			cb()
 		}
 		function mockEndApi(cb) {
+			aEndApi++
 			cb()
 		}
 		function getHandler(signal) {
@@ -180,6 +186,7 @@ exports['App Shutdown:'] = {
 		anomaly.anomalyDown = _ad
 		anomaly.anomaly = an
 		fs.writeFile = wf
-		apitouch.endApi = ea
+		apitouchxx.endApi = ea
+		apilist.invokeEndApi = iea
 	}
 }

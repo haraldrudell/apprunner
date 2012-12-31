@@ -1,10 +1,11 @@
 // test-apitouch.js
 // © Harald Rudell 2012
 
-var apitouch = require('../lib/apitouch')
+var apitouch = require('../lib/apitouch-x')
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 
+exports['Api Touch:'] = {'DISABLED': function () {var exports={}
 exports['Api Touch:'] = {
 	'Apis Ready': function (done) {
 		var readys = 0
@@ -30,4 +31,4 @@ exports['Api Touch:'] = {
 			cb()
 		}
 	},
-}
+}}}
