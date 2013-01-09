@@ -6,6 +6,8 @@ var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
 // http://nodejs.org/api/events.html
 var events = require('events')
+// http://nodejs.org/api/path.html
+var path = require('path')
 
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
