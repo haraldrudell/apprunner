@@ -11,7 +11,7 @@
 		"email",
 		"app"
 	],
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"contributors": [
 		{
 			"name": "Harald Rudell",
@@ -20,10 +20,10 @@
 		}
 	],
 	"devDependencies": {
-		"mochawrapper": ">= 0.0.31"
+		"mochawrapper": ">= 0.0.34"
 	},
 	"dependencies": {
-		"haraldutil": ">= 0.1.5"
+		"haraldutil": ">= 0.1.15"
 	},
 	"repository": {
 		"type": "git",
