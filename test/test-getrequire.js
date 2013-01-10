@@ -16,9 +16,9 @@ var path = require('path')
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 
-aa = apilist.addApi
-gr = rqsm.getRqs
-gt = haraldutil.getType
+var aa = apilist.addApi
+var gr = rqsm.getRqs
+var gt = haraldutil.getType
 
 exports['GetRequire:'] = {
 	'Exports': function () {
@@ -31,72 +31,139 @@ exports['GetRequire:'] = {
 		var actual = getrequire.getRequire(function () {})
 		assert.equal(typeof actual, 'function')
 	},
+
 	'GetRequire NotFunction': function () {
 		assert.throws(function () {
 			getrequire.getRequire()
 		}, /not function/)
 	},
-	'GetRequire ApiList Error': function () {
-		apilist.addApi = function () {return 'BAD'}
-		assert.throws(function () {
-			getrequire.getRequire(function () {}, null, {api: 'API'})
-		}, /BAD/)
-	},
 	'GetRequire Provided Emitter': function () {
 		var emitter = new events.EventEmitter
 		var api = 'API'
-		var timeoutMs = 5
-		var aGetRqs = []
-		var eGetRqs = [[0, api, timeoutMs]]
-		var rqs = 5
+		var theExports = {}
 
 		apilist.addApi = function () {return {}}
-		rqsm.getRqs = function (cb, scope, to) {aGetRqs.push([cb, scope, to]); return rqs}
-		var actual = getrequire.getRequire(function () {}, null, {api: api, emScope: emitter, timeoutMs: timeoutMs})
+		var actual = getrequire.getRequire(function () {}, theExports, {api: api, initApi: function () {}, emScope: emitter, ready: false})
 
 		assert.equal(actual.emitter, emitter)
 		assert.equal(emitter.id, api)
-		assert.equal(actual.rqs, rqs)
-		assert.equal(typeof (eGetRqs[0][0] = aGetRqs[0] && aGetRqs[0][0]), 'function')
-		assert.deepEqual(aGetRqs, eGetRqs)
+		assert.ok(theExports.initApi)
 	},
-	'GetRequire Request Emitter': function () {
-		var api = 'API'
-		var rqScope = 'RQSCOPE'
+	'GetRequire Requested Emitter': function () {
 		var emScope = 'EMSCOPE'
-		var aGetRqs = []
-		var eGetRqs = [[0, rqScope, undefined]]
-		var rqs = 5
 
-		apilist.addApi = function () {return {}}
-		rqsm.getRqs = function (cb, scope, to) {aGetRqs.push([cb, scope, to]); return rqs}
-		var actual = getrequire.getRequire(function () {}, null, {api: api, emScope: emScope, rqScope: rqScope})
+		var actual = getrequire.getRequire(function () {}, null, {emScope: emScope})
 
 		assert.ok(actual.emitter instanceof events.EventEmitter)
 		assert.equal(actual.emitter.id, emScope)
-		assert.equal(actual.rqs, rqs)
-		assert.equal(typeof (eGetRqs[0][0] = aGetRqs[0] && aGetRqs[0][0]), 'function')
-		assert.deepEqual(aGetRqs, eGetRqs)
+	},
+	'GetRequire InitApi Wrapper': function () {
+		var initApi = function () {}
+		var theExports = {}
+
+		getrequire.getRequire(function () {}, theExports, {initApi: initApi})
+
+		assert.equal(typeof theExports.initApi, 'function')
+		assert.notEqual(theExports.initApi, initApi)
 	},
 	'GetRequire InitApi Not Function': function () {
 		var initApi = 5
 
 		assert.throws(function () {
-			apilist.addApi = function () {return {}}
 			getrequire.getRequire(function () {}, null, {initApi: initApi})
 		}, /opts.initApi not function/)
-
 	},
-	'GetRequire Exports Null': function () {
+	'GetRequire InitApi Exports Null': function () {
 		var initApi = function () {}
 
 		assert.throws(function () {
-			apilist.addApi = function () {return {}}
 			getrequire.getRequire(function () {}, null, {initApi: initApi})
 		}, /exports null/)
-
 	},
-	'GetRequire InitApi Wrapper': function () {
+	'GetRequire AddApi': function () {
+		var api = 'API'
+		var opts = {api: api, initApi: function () {}}
+		var theExports = {}
+		var aAddApi = []
+		var eAddApi = [['emitter', opts]]
+
+		apilist.addApi = function (r, o) {aAddApi.push([r, o]); return {}}
+		var actual = getrequire.getRequire(function () {}, theExports, opts)
+
+		assert.ok((eAddApi[0][0] = aAddApi[0] && aAddApi[0][0]) instanceof events.EventEmitter)
+		assert.deepEqual(aAddApi, eAddApi)
+	},
+	'GetRequire AddApi No InitApi': function () {
+		var api = 'API'
+		var opts = {api: api}
+
+		assert.throws(function () {
+			var actual = getrequire.getRequire(function () {}, null, opts)
+		}, /InitApi missing/)
+	},
+	'GetRequire ApiList Error': function () {
+		var api = 'API'
+		var opts = {api: api, initApi: function () {}}
+		var theExports = {}
+
+		apilist.addApi = function () {return 'BAD'}
+		assert.throws(function () {
+			getrequire.getRequire(function () {}, theExports, opts)
+		}, /BAD/)
+	},
+	'GetRequire Rqs': function () {
+		var rqScope = 'RQSCOPE'
+		var rqs = 5
+		var aGetRqs = []
+		var eGetRqs = [[0, rqScope, undefined]]
+
+		rqsm.getRqs = function (cb, scope, to) {aGetRqs.push([cb, scope, to]); return rqs}
+		var actual = getrequire.getRequire(function () {}, null, {rqScope: rqScope})
+
+		assert.equal(actual.rqs, rqs)
+		assert.equal(typeof (eGetRqs[0][0] = aGetRqs[0] && aGetRqs[0][0]), 'function')
+		assert.deepEqual(aGetRqs, eGetRqs)
+	},
+	'GetRequire Rqs ApiName': function () {
+		var api = 'API'
+		var opts = {api: api, initApi: function () {}, timeoutMs: 5, rqScope: true}
+		var aGetRqs = []
+		var eGetRqs = [['cb', api, opts.timeoutMs]]
+		var rqs = 5
+		var theExports = {}
+		var aAddApi = 0
+
+		apilist.addApi = function () {aAddApi++; return {}}
+		rqsm.getRqs = function (cb, scope, to) {aGetRqs.push([cb, scope, to]); return rqs}
+		var actual = getrequire.getRequire(function () {}, theExports, opts)
+
+		assert.ok(aAddApi)
+		assert.equal(actual.rqs, rqs)
+		assert.equal(typeof (eGetRqs[0][0] = aGetRqs[0] && aGetRqs[0][0]), 'function')
+		assert.deepEqual(aGetRqs, eGetRqs)
+	},
+	'GetApiData': function () {
+		var api = 'API'
+		var apiOpts = {apiMap: {}}
+		apiOpts.apiMap[api] = {onLoad: true}
+		var expected = {
+			apiMap: 1,
+			onloads: [api],
+			apiPath: 1,
+		}
+
+		getrequire.init(apiOpts)
+		var actual = getrequire.getApiData()
+		assert.deepEqual(actual, expected)
+	},
+	'after': function () {
+		apilist.addApi = aa
+		rqsm.getRqs = gr
+	},
+}
+
+exports['InitApiWrapper:'] = {
+	'Opts': function () {
 		var initApi = function (opts) {aOpts.push(opts)}
 		var exports = {}
 		var opts = {a: 1}
@@ -117,6 +184,12 @@ exports['GetRequire:'] = {
 		assert.equal(initAppOpts.appName, undefined)
 		assert.equal(Object.keys(initAppOpts).length, 4)
 	},
+	'after': function () {
+		apilist.addApi = aa
+	}
+}
+
+exports['ApiRequire:'] = {
 	'GetRequire Override': function () {
 		var moduleName = 'MODULENAME'
 		var file = 'FILE'
@@ -216,19 +289,8 @@ exports['GetRequire:'] = {
 
 		assert.equal(actual, expected)
 	},
-	'GetOnLoads': function () {
-		var api = 'API'
-		var expected = [api]
-		var apiOpts = {apiMap: {}}
-		apiOpts.apiMap[api] = {onLoad: true}
 
-		getrequire.init(apiOpts)
-		var actual = getrequire.getOnLoads()
-		assert.deepEqual(actual, expected)
-	},
 	'after': function () {
-		apilist.addApi = aa
-		rqsm.getRqs = gr
 		haraldutil.getType = gt
-	},
+	}
 }

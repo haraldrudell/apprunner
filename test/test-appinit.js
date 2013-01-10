@@ -2,8 +2,10 @@
 // © Harald Rudell 2012
 
 var appinit = require('../lib/appinit')
+
 var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
+var apionloader = require('../lib/apionloader')
 // http://nodejs.org/api/events.html
 var events = require('events')
 // http://nodejs.org/api/path.html
@@ -15,8 +17,12 @@ var assert = require('mochawrapper')
 var _log = console.log
 var _asi = appshutdown.init
 var _ai = anomaly.initAnomaly
+var dd = apionloader.doOnLoads
 
 exports['App Runner:'] = {
+	'Exports': function () {
+		assert.exportsTest(appinit, 4)
+	},
 	'Init App': function () {
 		var self = this
 		var consoleLogs = 0
@@ -39,6 +45,7 @@ exports['App Runner:'] = {
 		var aInitAnomaly = []
 		var eInitAnomaly = [[anomalyOpts, sendMail, logger]]
 
+		apionloader.doOnLoads = function () {}
 		console.log = mockConsoleLog
 		appshutdown.init = mockAppShutdownInit
 		anomaly.initAnomaly = mockInitAnomaly
@@ -65,9 +72,25 @@ exports['App Runner:'] = {
 			aInitAnomaly.push([opts, mail, logger])
 		}
 	},
+	'GetAppName': function () {
+		var actual = appinit.getAppName()
+
+		assert.equal(typeof actual, 'string')
+	},
+	'GetLaunchFolder': function () {
+		var actual = appinit.getLaunchFolder()
+
+		assert.equal(typeof actual, 'string')
+	},
+	'GetAppID': function () {
+		var actual = appinit.getAppID()
+
+		assert.equal(typeof actual, 'string')
+	},
 	'after': function () {
 		console.log = _log
 		appshutdown.init = _asi
 		anomaly.initAnomaly = _ai
+		apionloader.doOnLoads = dd
 	}
 }

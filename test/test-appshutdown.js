@@ -110,7 +110,10 @@ exports['App Shutdown:'] = {
 		var sigIntHandler = getHandler('SIGUSR2', defaults)
 
 		fs.writeFile = function (file, data, cb) {aWfs.push([file, data]); cb()}
+
+		console.log = function () {}
 		sigIntHandler()
+		console.log = _log
 
 		assert.equal(aWfs.length, 1)
 		var eFile = path.join(defaults.init.tmpFolder, process.pid + '.json')

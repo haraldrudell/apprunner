@@ -14,29 +14,35 @@ var path = require('path')
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 
-var _log = console.log
 var ta = apitouch.touchApis
+var _rqs = apilist.testReset()
 
-exports['ApiList:'] = {
+exports['AddApi:'] = {
 	'Exports': function () {
 		assert.exportsTest(apilist, 5)
 	},
 	'AddApi': function () {
-		apilist.testReset()
 		var api = 'API'
 		var emitter = new events.EventEmitter
 		emitter.id = api
-		var expected1 = 'Duplicate api: ' + emitter.id
 
+		apilist.testReset({addRq: function () {}})
 		var actual = apilist.addApi(emitter)
 		assert.ok(actual)
 		assert.equal(actual.api, api)
 		assert.equal(actual.emitter, emitter)
 		assert.equal(emitter.listeners('ready').length, 1)
 		emitter.removeAllListeners('ready')
+	},
+	'AddApi After EndApi': function () {
+		apilist.testReset()
+		apitouch.touchApis = function (e, cb) {cb()}
+		apilist.invokeEndApi(afterEndApi)
 
-		var actual = apilist.addApi(emitter)
-		assert.equal(actual, expected1)
+		function afterEndApi(err) {
+			var actual = apilist.addApi()
+			assert.equal(actual, 'addApi invoked after endApi')
+		}
 	},
 	'AddApi Emitter': function () {
 		apilist.testReset()
@@ -50,17 +56,64 @@ exports['ApiList:'] = {
 		var actual = apilist.addApi(emitter)
 		assert.equal(actual, 'Emitter id property (api name) not string or blank')
 	},
-	'AddApi NoReady': function () {
+	'AddApi Duplicate': function () {
+		var api = 'API'
+		var emitter = new events.EventEmitter
+		emitter.id = api
+		var expected1 = 'Duplicate api: ' + emitter.id
+
+		apilist.testReset({addRq: function () {}})
+		var actual = apilist.addApi(emitter)
+		assert.ok(actual)
+		assert.equal(actual.api, api)
+		assert.equal(actual.emitter, emitter)
+		assert.equal(emitter.listeners('ready').length, 1)
+		emitter.removeAllListeners('ready')
+
+		var actual = apilist.addApi(emitter)
+		assert.equal(actual, expected1)
+	},
+	'AddApi Ready False': function () {
 		apilist.testReset()
 		var api = 'API'
 		var emitter = new events.EventEmitter
 		emitter.id = api
-		emitter.noReady = true
 
-		var actual = apilist.addApi(emitter)
+		var actual = apilist.addApi(emitter, {ready: false})
 		assert.equal(emitter.listeners('ready').length, 0)
 		assert.ok(actual.isReady)
 	},
+	'AddApi Ready Default': function () {
+		var api = 'API'
+		var emitter = new events.EventEmitter
+		emitter.id = api
+		var aAddRq = []
+		var eAddRq = [[api, undefined]]
+
+		apilist.testReset({addRq: function (api, t) {aAddRq.push([api, t])}})
+		var actual = apilist.addApi(emitter)
+
+		assert.deepEqual(aAddRq, eAddRq)
+	},
+	'AddApi Ready Timeout': function () {
+		var api = 'API'
+		var emitter = new events.EventEmitter
+		emitter.id = api
+		var aAddRq = []
+		var eAddRq = [[api, 1]]
+
+		apilist.testReset({addRq: function (api, t) {aAddRq.push([api, t])}})
+		var actual = apilist.addApi(emitter, {ready: 1})
+
+		assert.deepEqual(aAddRq, eAddRq)
+	},
+	'after': function () {
+		apitouch.touchApis = ta
+		apilist.testReset(_rqs)
+	}
+}
+
+exports['FindFn:'] = {
 	'AddApi Not Function': function () {
 		var api = 'API'
 		var emitter = new events.EventEmitter
@@ -69,20 +122,26 @@ exports['ApiList:'] = {
 		var expected1 = ' must be function'
 
 		;['saveApi', 'endApi', 'apiState'].forEach(function (fn) {
-			apilist.testReset()
 			var opts = {}
 			opts[fn] = 1
 
+			apilist.testReset({addRq: function () {}})
 			var actual = apilist.addApi(emitter, opts)
 
 			assert.ok(typeof actual, 'string')
 			assert.equal(actual.slice(-expected1.length), expected1)
 		})
 	},
+	'after': function () {
+		apilist.testReset(_rqs)
+	}
+}
+
+exports['OnReady:'] = {
 	'OnReady': function () {
 
 		// reset and install our own error listener
-		apilist.testReset()
+		apilist.testReset({addRq: function () {return {clear: function () {}}}})
 		var apiErrorEmitter = apierror.init()
 		apperror.removeErrorListener(apiErrorEmitter)
 		var aAno = 0
@@ -148,6 +207,13 @@ exports['ApiList:'] = {
 
 		apierror.init()
 	},
+	'after': function () {
+		apierror.init()
+		apilist.testReset(_rqs)
+	}
+}
+
+exports['EndApi:'] = {
 	'EndApi IsEndApiFn': function () {
 		var aTouch = []
 		var eTouch = ['saveApi', 'endApi']
@@ -208,32 +274,26 @@ exports['ApiList:'] = {
 			assert.ok(err)
 		}
 	},
-	'AddApi After EndApi': function () {
-		apilist.testReset()
-		apitouch.touchApis = function (e, cb) {cb()}
-		apilist.invokeEndApi(afterEndApi)
+	'after': function () {
+		apitouch.touchApis = ta
+		apilist.testReset(_rqs)
+	}
+}
 
-		function afterEndApi(err) {
-			var actual = apilist.addApi()
-			assert.equal(actual, 'addApi invoked after endApi')
-		}
-	},
+exports['GetState:'] = {
 	'GetState': function () {
 		var api = 'API'
 		var emitter = new events.EventEmitter
 		emitter.id = api
-		emitter.noReady = true
 		var expected = {}
 		expected[api] = {api: api, emitter: emitter, isReady: true}
 
-		apilist.testReset()
-		apilist.addApi(emitter)
+		apilist.testReset({addRq: function () {}})
+		apilist.addApi(emitter, {ready: false})
 		var actual = apilist.getState()
 		assert.deepEqual(actual, expected)
 	},
 	'after': function () {
-		apierror.init()
-		console.log = _log
-		apitouch.touchApis = ta
+		apilist.testReset(_rqs)
 	}
 }
