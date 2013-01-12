@@ -4,8 +4,12 @@
 var appinit = require('../lib/appinit')
 
 var appshutdown = require('../lib/appshutdown')
+var apperror = require('../lib/apperror')
 var anomaly = require('../lib/anomaly')
+var getrequire = require('../lib/getrequire')
 var apionloader = require('../lib/apionloader')
+var apimanagerx = require('../lib/apimanager-x')
+var emailer = require('../lib/emailer')
 // http://nodejs.org/api/events.html
 var events = require('events')
 // http://nodejs.org/api/path.html
@@ -16,81 +20,195 @@ var assert = require('mochawrapper')
 
 var _log = console.log
 var _asi = appshutdown.init
+var ae = apperror.addErrorListener
 var _ai = anomaly.initAnomaly
+var gi = getrequire.init
+var lo = apimanagerx.loadOnLoad
 var dd = apionloader.doOnLoads
+var sm = emailer.setSendMail
+var ea = anomaly.enableAnomalyMail
+var ee = appinit.testEmitter
 
-exports['App Runner:'] = {
+exports['AppInit:'] = {
 	'Exports': function () {
 		assert.exportsTest(appinit, 4)
 	},
-	'Init App': function () {
-		var self = this
-		var consoleLogs = 0
-		var appShutdownInits = 0
-		var app = new events.EventEmitter()
-		var logger = 3
-		var sendMail = 5
-		var anomalyOpts = 7
+	'InitApp': function () {
 		var defaults = {
-			anomaly: anomalyOpts,
-			init: {
-				logger: logger,
-				ops: {
-					sendMail: sendMail,
-				},
-				appFolder: true
-			},
-			api: true,
+			noInfoLog: true,
+			anomaly: false,
+			api: false,
 		}
+		var appShutdownInits = 0
+		appshutdown.init = function mockAppShutdownInit() {appShutdownInits++}
+
+		var aAddErrorListener = 0
+		apperror.addErrorListener = function mockAddErrorListener(o) {aAddErrorListener++}
+
+		var aInit = 0
+		getrequire.init = function mockInit() {aInit++}
+
+		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
+
+		var aDoOnLoads = 0
+		apionloader.doOnLoads = function mockDoOnLoads() {aDoOnLoads++}
+
+		appinit.initApp(defaults)
+
+		assert.equal(appShutdownInits, 1)
+		assert.equal(aAddErrorListener, 2)
+		assert.equal(aInit, 1)
+		assert.equal(aDoOnLoads, 1)
+	},
+	'InitApp InitAnomaly App': function () {
+		var defaults = {
+			anomaly: {
+				noEmail: '1/1/2013',
+				app: 'expressObject',
+			},
+			init: {
+				logger: 3,
+				ops: {
+					sendMail: mockSendMail,
+				},
+				appName: 'APPNAME',
+				identifier: 'APPIDENTIFIER'
+			},
+		}
+
+		var app = {}
+		var aAddErrorListener = []
+		var eAddErrorListener = [app, 'emitter', appinit.testEmitter()]
+		apperror.addErrorListener = function mockAddErrorListener(o) {aAddErrorListener.push(o)}
+
+		appshutdown.init = function mockAppShutdownInit() {}
+		getrequire.init = function mockInit() {}
+		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
+		apionloader.doOnLoads = function mockDoOnLoads() {}
+		apimanagerx.initApi = function mockInitApi() {}
+
+		function mockSendMail(s, b) {}
+		emailer.setSendMail = function mockSetSendMail(x) {assert.equal(x, mockSendMail)}
+
+		var aEnableAnomalyMail = []
+		var tzMs = (new Date).getTimezoneOffset() * 60*1e3
+		var msPerDay = 24*60*60*1e3
+		var dayTimeval = (Math.floor((new Date(defaults.anomaly.noEmail).getTime() - tzMs) / msPerDay) + 1) * msPerDay + tzMs
+		var eEnableAnomalyMail = [dayTimeval]
+		anomaly.enableAnomalyMail = function mockEnableAnomalyMail(x) {aEnableAnomalyMail.push(x)}
+
 		var aInitAnomaly = []
-		var eInitAnomaly = [[anomalyOpts, sendMail, logger]]
+		var eInitAnomaly = [[defaults.anomaly, mockSendMail, defaults.init.logger]]
+		anomaly.initAnomaly = function mockInitAnomaly(d, s, l) {aInitAnomaly.push([d, s, l])}
 
-		apionloader.doOnLoads = function () {}
-		console.log = mockConsoleLog
-		appshutdown.init = mockAppShutdownInit
-		anomaly.initAnomaly = mockInitAnomaly
-
+		console.log = function () {}
 		appinit.initApp(defaults, app)
 		console.log = _log
-		assert.equal(app.listeners('error').length, 1, 'error listener added')
-		assert.deepEqual(aInitAnomaly, eInitAnomaly, 'Anomaly invocations')
-		assert.equal(consoleLogs, 2, 'Console invocations')
-		assert.equal(appShutdownInits, 1, 'App Shutdown Init invocations')
 
-		function mockAppOn(event, handler) {
-			assert.equal(typeof handler, 'function')
-			aAppOn.push(event)
+		assert.ok((eAddErrorListener[1] = aAddErrorListener[1]) instanceof events.EventEmitter)
+		assert.deepEqual(aAddErrorListener, eAddErrorListener)
+		assert.deepEqual(aEnableAnomalyMail, eEnableAnomalyMail)
+		assert.deepEqual(aInitAnomaly, eInitAnomaly)
+	},
+	'GetAppData': function () {
+		var defaults = {
+			noInfoLog: true,
+			anomaly: false,
+			api: false,
+			init: {
+				logger: 3,
+				ops: {
+					sendMail: mockSendMail,
+				},
+				appName: 'APPNAME',
+				identifier: 'APPIDENTIFIER',
+			},
 		}
-		function mockConsoleLog(a) {
-//console.error(arguments.callee.name, a)
-			consoleLogs++
+
+		function mockSendMail(s, b) {}
+
+		appshutdown.init = function mockAppShutdownInit() {}
+		apperror.addErrorListener = function mockAddErrorListener() {}
+		getrequire.init = function mockInit() {}
+		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
+		apionloader.doOnLoads = function mockDoOnLoads() {}
+		emailer.setSendMail = function mockSetSendMail() {}
+
+		appinit.initApp(defaults)
+
+		var expected = {
+			sendMail: defaults.init.ops.sendMail,
+			logger: defaults.init.logger,
+			appName: defaults.init.appName,
+			launchFolder: getLaunchFolder(),
+			appId: defaults.init.identifier,
+			registerHandler: 'f'
 		}
-		function mockAppShutdownInit() {
-			appShutdownInits++
-		}
-		function mockInitAnomaly(opts, mail, logger) {
-			aInitAnomaly.push([opts, mail, logger])
+		var actual = appinit.getAppData()
+
+		assert.equal(typeof (expected.sendMail = actual && actual.sendMail), 'function')
+		assert.equal(typeof (expected.registerHandler = actual && actual.registerHandler), 'function')
+		assert.deepEqual(actual, expected)
+
+		function getLaunchFolder() {
+			var folder = require && require.main && require.main.filename
+			if (folder) folder = path.dirname(folder)
+			else {
+				var dir = __dirname && __dirname.length > 1 ? __dirname : process.cwd()
+				var pos = dir.indexOf('/node_modules/')
+				folder = ~pos ? dir.substring(0, pos) : dir
+			}
+			return folder
 		}
 	},
-	'GetAppName': function () {
-		var actual = appinit.getAppName()
+	'AddUriHandler': function () {
+		var uris = [
+			{uri: '/0', handler: function () {}},
+			{uri: '/1', handler: function () {}},
+		]
+		var aEmits = []
+		appinit.testEmitter({emit: function (e, a) {aEmits.push(a)}})
 
-		assert.equal(typeof actual, 'string')
-	},
-	'GetLaunchFolder': function () {
-		var actual = appinit.getLaunchFolder()
+		// register before a uri handler exists
+		var appData = appinit.getAppData()
+		appData.registerHandler(uris[0].uri, uris[0].handler)
 
-		assert.equal(typeof actual, 'string')
-	},
-	'GetAppID': function () {
-		var actual = appinit.getAppID()
+		assert.deepEqual(aEmits, [])
 
-		assert.equal(typeof actual, 'string')
+		// bad uri
+		appData.registerHandler(1, function () {})
+		assert.equal(aEmits.length, 1)
+
+		// bad handler
+		appData.registerHandler('/9', 1)
+		assert.equal(aEmits.length, 2)
+
+		// register uri handler
+		aEmits = []
+		var aAddRoute = []
+		var eAddRoute = [[uris[0].uri, uris[0].handler]]
+		function addRoute(u, f) {aAddRoute.push([u, f])}
+		appinit.addUriHandler(addRoute)
+
+		assert.deepEqual(aAddRoute, eAddRoute)
+
+		// register subsequent uri
+		appData.registerHandler(uris[1].uri, uris[1].handler)
+		eAddRoute.push([uris[1].uri, uris[1].handler])
+
+		assert.deepEqual(aAddRoute, eAddRoute)
+		assert.equal(aEmits.length, 0)
 	},
 	'after': function () {
 		console.log = _log
 		appshutdown.init = _asi
+		apperror.addErrorListener = ae
 		anomaly.initAnomaly = _ai
+		getrequire.init = gi
+		apimanagerx.loadOnLoad = lo
 		apionloader.doOnLoads = dd
+		emailer.setSendMail = sm
+		anomaly.enableAnomalyMail = ea
+		appinit.testEmitter(ee)
 	}
 }
