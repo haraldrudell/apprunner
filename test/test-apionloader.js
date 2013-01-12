@@ -9,7 +9,6 @@ var getrequire = require('../lib/getrequire')
 var assert = require('mochawrapper')
 
 var ga = getrequire.getApiData
-var gr = getrequire.getRequire
 
 exports['ApiOnloader:'] = {
 	'Exports': function () {
@@ -17,21 +16,19 @@ exports['ApiOnloader:'] = {
 	},
 	'DoOnLoads': function () {
 		var api = 'API'
-		var aReq = []
-		var eReq = [api]
-		var aInit = 0
-		var mockModule = {initApi: function () {aInit++}}
 
-		function mockApiRequire(api) {aReq.push(api); return mockModule}
-		getrequire.getRequire = function() {return mockApiRequire}
-		getrequire.getApiData = function () {return {onloads: [api]}}
+		var aInit = 0
+		var testMap = {}
+		testMap[api] = {initApi: function mockInitApi() {aInit++}}
+		getrequire.init(undefined, undefined, testMap)
+
+		getrequire.getApiData = function mockGetApiData() {return {onloads: [api]}}
 		apionloader.doOnLoads(function () {})
 
 		assert.ok(aInit)
-		assert.deepEqual(aReq, eReq)
 	},
 	'after': function () {
-		getrequire.getRequire = gr
+		getrequire.init(undefined, undefined, false)
 		getrequire.getApiData = ga
 
 	}
