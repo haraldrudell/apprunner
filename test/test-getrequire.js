@@ -22,7 +22,7 @@ var gt = haraldutil.getType
 
 exports['GetRequire:'] = {
 	'Exports': function () {
-		assert.exportsTest(getrequire, 3)
+		assert.exportsTest(getrequire, 4)
 	},
 	'Init': function () {
 		getrequire.init({appData: {}})
@@ -190,7 +190,8 @@ exports['InitApiWrapper:'] = {
 		// setup apiConfigs translating from module name to json opts
 		var apiConfigs = {}
 		apiConfigs[moduleName] = jsonOpts
-		getrequire.init({apiOpts: {apiMap: apiConfigs}, appData: {}}, null, exportsMap)
+		getrequire.init({apiOpts: {apiMap: apiConfigs}, appData: {}})
+		getrequire.testIntercept({exportsMap: exportsMap})
 
 		initApiWrapper(invocationOps)
 
@@ -229,7 +230,7 @@ exports['ApiRequire:'] = {
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {assert.equal(module, file); throw e}
 
-		getrequire.init({apiOpts: apiOpts, appData: {}})
+		getrequire.testIntercept({apiOpts: apiOpts})
 		var apiRequire = getrequire.getRequire(require)
 		assert.throws(function () {
 			apiRequire(moduleName)
@@ -244,7 +245,7 @@ exports['ApiRequire:'] = {
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {assert.equal(module, file); throw e}
 
-		getrequire.init({apiOpts: apiOpts, appData: {}})
+		getrequire.testIntercept({apiOpts: apiOpts})
 		var apiRequire = getrequire.getRequire(require)
 		assert.throws(function () {
 			apiRequire(moduleName)
@@ -304,5 +305,6 @@ exports['ApiRequire:'] = {
 
 	'after': function () {
 		haraldutil.getType = gt
+		getrequire.testIntercept({apiOpts: false, exportsMap: false})
 	}
 }
