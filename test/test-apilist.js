@@ -19,7 +19,7 @@ var _rqs = apilist.testReset()
 
 exports['AddApi:'] = {
 	'Exports': function () {
-		assert.exportsTest(apilist, 5)
+		assert.exportsTest(apilist, 6)
 	},
 	'AddApi': function () {
 		var api = 'API'
@@ -28,11 +28,10 @@ exports['AddApi:'] = {
 
 		apilist.testReset({addRq: function () {}})
 		var actual = apilist.addApi(emitter)
+
 		assert.ok(actual)
 		assert.equal(actual.api, api)
 		assert.equal(actual.emitter, emitter)
-		assert.equal(emitter.listeners('ready').length, 1)
-		emitter.removeAllListeners('ready')
 	},
 	'AddApi After EndApi': function () {
 		apilist.testReset()
@@ -67,8 +66,6 @@ exports['AddApi:'] = {
 		assert.ok(actual)
 		assert.equal(actual.api, api)
 		assert.equal(actual.emitter, emitter)
-		assert.equal(emitter.listeners('ready').length, 1)
-		emitter.removeAllListeners('ready')
 
 		var actual = apilist.addApi(emitter)
 		assert.equal(actual, expected1)
@@ -83,15 +80,16 @@ exports['AddApi:'] = {
 		assert.equal(emitter.listeners('ready').length, 0)
 		assert.ok(actual.isReady)
 	},
-	'AddApi Ready Default': function () {
+	'AddApi Ready true': function () {
 		var api = 'API'
 		var emitter = new events.EventEmitter
 		emitter.id = api
+
 		var aAddRq = []
 		var eAddRq = [[api, undefined]]
-
 		apilist.testReset({addRq: function (api, t) {aAddRq.push([api, t])}})
-		var actual = apilist.addApi(emitter)
+
+		var actual = apilist.addApi(emitter, {ready: null})
 
 		assert.deepEqual(aAddRq, eAddRq)
 	},
@@ -106,6 +104,9 @@ exports['AddApi:'] = {
 		var actual = apilist.addApi(emitter, {ready: 1})
 
 		assert.deepEqual(aAddRq, eAddRq)
+	},
+	'ApisReady TODO': function () {
+		// TODO implement test
 	},
 	'after': function () {
 		apitouch.touchApis = ta
@@ -153,7 +154,7 @@ exports['OnReady:'] = {
 		var api = 'API'
 		var emitter = new events.EventEmitter
 		emitter.id = api
-		var actual = apilist.addApi(emitter)
+		var actual = apilist.addApi(emitter, {ready: null})
 		assert.ok(typeof actual !== 'string')
 		onReady = emitter.listeners('ready')[0]
 		assert.equal(typeof onReady, 'function')

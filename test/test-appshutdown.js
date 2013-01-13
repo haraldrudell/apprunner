@@ -3,7 +3,6 @@
 
 var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')
-var apitouchxx = require('../lib/apitouch-x')
 var apilist = require('../lib/apilist')
 
 // https://github.com/haraldrudell/mochawrapper
@@ -19,7 +18,6 @@ var _on = process.on
 var _ad = anomaly.anomalyDown
 var an = anomaly.anomaly
 var wf = fs.writeFile
-var ea = apitouchxx.endApi
 var iea = apilist.invokeEndApi
 
 exports['App Shutdown:'] = {
@@ -27,47 +25,45 @@ exports['App Shutdown:'] = {
 		assert.exportsTest(appshutdown, 2)
 	},
 	'Init': function () {
-		var aOns = {}
-		var eOns = ['uncaughtException', 'SIGINT', 'SIGUSR2']
-
-		process.on = mockOn
-
-		appshutdown.init({})
-		assert.equal(Object.keys(aOns).length, eOns.length, 'Number of process.on invocations')
-		eOns.forEach(function (event) {
-			if (!aOns[event]) assert.ok(false, 'Missing process listener for event:' + event)
-		})
-
-		function mockOn(event, handler) {
-			assert.equal(typeof event, 'string')
-			assert.equal(typeof handler, 'function')
-			aOns[event] = handler
+		var opts = {
+			signals: {
+				uncaughtException: false,
+				SIGINT: false,
+				SIGUSR2: false,
+			},
 		}
+
+		appshutdown.init(opts)
 	},
 	'ProcessSigInt: SIGINT or ctrl-Break': function () {
+		var opts = {
+			signals: {
+				uncaughtException: false,
+				SIGUSR2: false,
+			},
+			logger: function () {},
+		}
+
+		var aOn = {}
+		process.on = function(e, f) {aOn[e] = f}
+
+		appshutdown.init(opts)
+
+		assert.equal(Object.keys(aOn).length, 1, Object.keys(aOn))
+		assert.equal(typeof aOn.SIGINT, 'function')
+
 		var aDowns = 0
+		anomaly.anomalyDown = function(cb) {aDowns++; cb()}
+
 		var aExits = []
 		var eExits = [0]
-		var sigIntHandler = getHandler('SIGINT')
-
 		process.exit = function (code) {aExits.push(code)}
-		apitouchxx.endApi = function (cb) {cb()}
+
 		apilist.invokeEndApi = function (cb) {cb()}
-		anomaly.anomalyDown = function(cb) {aDowns++; cb()}
-		console.log = function () {}
-		sigIntHandler()
-		console.log = _log
+		aOn.SIGINT()
 
 		assert.deepEqual(aExits, eExits, 'Incorrect exitCode')
 		assert.equal(aDowns, 1)
-
-		function getHandler(signal) {
-			var handler
-			process.on = function(e, f) {if (e == signal) handler = f}
-			appshutdown.init({})
-			process.on = _on
-			return handler
-		}
 	},
 	'ProcessException': function () {
 		var aAnomaly = []
@@ -81,7 +77,6 @@ exports['App Shutdown:'] = {
 		anomaly.anomalyDown = function (cb) {aAnomalyDown++; cb()}
 		anomaly.anomaly = function () {aAnomaly.push([arguments])}
 		process.exit = function (code) {aProcessExit.push(code)}
-		apitouchxx.endApi = function (cb) {aEndApi++; cb()}
 		apilist.invokeEndApi = function (cb) {aEndApi++; cb()}
 		console.log = function () {}
 		processException(Error('x'))
@@ -90,7 +85,7 @@ exports['App Shutdown:'] = {
 		assert.deepEqual(aProcessExit, eProcessExit, 'Process exit code should be 2')
 		assert.equal(aAnomaly.length, 1, 'One anomaly should be logged')
 		assert.equal(aAnomalyDown, 1, 'Anomaly should be shut down exactly once')
-		assert.equal(aEndApi, 2, 'Anomaly should be shut down exactly once')
+		assert.equal(aEndApi, 1, 'Anomaly should be shut down exactly once')
 
 		function getHandler(signal) {
 			var handler
@@ -101,30 +96,30 @@ exports['App Shutdown:'] = {
 		}
 	},
 	'SIGUSR2': function () {
-		var defaults = {
-			init: {tmpFolder: 'TMP'},
-			PORT: 'port',
-			URL: 'url',
+		var opts = {
+			tmpFolder: 'TMP',
+			appInfo: {
+				PORT: 'port',
+				URL: 'url',
+			},
 		}
 		var aWfs = []
-		var sigIntHandler = getHandler('SIGUSR2', defaults)
+		var sigIntHandler = getHandler('SIGUSR2', opts)
 
 		fs.writeFile = function (file, data, cb) {aWfs.push([file, data]); cb()}
 
-		console.log = function () {}
 		sigIntHandler()
-		console.log = _log
 
 		assert.equal(aWfs.length, 1)
-		var eFile = path.join(defaults.init.tmpFolder, process.pid + '.json')
+		var eFile = path.join(opts.tmpFolder, process.pid + '.json')
 		assert.equal(aWfs[0][0], eFile)
-		var eData = JSON.stringify({PORT: defaults.PORT, URL: defaults.URL})
+		var eData = JSON.stringify(opts.appInfo)
 		assert.equal(aWfs[0][1], eData)
 
 		function getHandler(signal, defaults) {
 			var handler
 			process.on = function(e, f) {if (e == signal) handler = f}
-			appshutdown.init(defaults)
+			appshutdown.init(opts)
 			process.on = _on
 			return handler
 		}
@@ -136,7 +131,6 @@ exports['App Shutdown:'] = {
 		anomaly.anomalyDown = _ad
 		anomaly.anomaly = an
 		fs.writeFile = wf
-		apitouchxx.endApi = ea
 		apilist.invokeEndApi = iea
 	}
 }

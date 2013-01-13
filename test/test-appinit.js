@@ -8,7 +8,6 @@ var apperror = require('../lib/apperror')
 var anomaly = require('../lib/anomaly')
 var getrequire = require('../lib/getrequire')
 var apionloader = require('../lib/apionloader')
-var apimanagerx = require('../lib/apimanager-x')
 var emailer = require('../lib/emailer')
 // http://nodejs.org/api/events.html
 var events = require('events')
@@ -23,7 +22,6 @@ var _asi = appshutdown.init
 var ae = apperror.addErrorListener
 var _ai = anomaly.initAnomaly
 var gi = getrequire.init
-var lo = apimanagerx.loadOnLoad
 var dd = apionloader.doOnLoads
 var sm = emailer.setSendMail
 var ea = anomaly.enableAnomalyMail
@@ -47,8 +45,6 @@ exports['AppInit:'] = {
 
 		var aInit = 0
 		getrequire.init = function mockInit() {aInit++}
-
-		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
 
 		var aDoOnLoads = 0
 		apionloader.doOnLoads = function mockDoOnLoads() {aDoOnLoads++}
@@ -76,16 +72,13 @@ exports['AppInit:'] = {
 			},
 		}
 
-		var app = {}
 		var aAddErrorListener = []
-		var eAddErrorListener = [app, 'emitter', appinit.testEmitter()]
+		var eAddErrorListener = ['emitter', appinit.testEmitter()]
 		apperror.addErrorListener = function mockAddErrorListener(o) {aAddErrorListener.push(o)}
 
 		appshutdown.init = function mockAppShutdownInit() {}
 		getrequire.init = function mockInit() {}
-		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
 		apionloader.doOnLoads = function mockDoOnLoads() {}
-		apimanagerx.initApi = function mockInitApi() {}
 
 		function mockSendMail(s, b) {}
 		emailer.setSendMail = function mockSetSendMail(x) {assert.equal(x, mockSendMail)}
@@ -101,11 +94,11 @@ exports['AppInit:'] = {
 		var eInitAnomaly = [[defaults.anomaly, mockSendMail, defaults.init.logger]]
 		anomaly.initAnomaly = function mockInitAnomaly(d, s, l) {aInitAnomaly.push([d, s, l])}
 
-		console.log = function () {}
-		appinit.initApp(defaults, app)
+		console.log = function () {} // I want to test the console.log statements, too
+		appinit.initApp(defaults)
 		console.log = _log
 
-		assert.ok((eAddErrorListener[1] = aAddErrorListener[1]) instanceof events.EventEmitter)
+		assert.ok((eAddErrorListener[0] = aAddErrorListener[0]) instanceof events.EventEmitter)
 		assert.deepEqual(aAddErrorListener, eAddErrorListener)
 		assert.deepEqual(aEnableAnomalyMail, eEnableAnomalyMail)
 		assert.deepEqual(aInitAnomaly, eInitAnomaly)
@@ -130,7 +123,6 @@ exports['AppInit:'] = {
 		appshutdown.init = function mockAppShutdownInit() {}
 		apperror.addErrorListener = function mockAddErrorListener() {}
 		getrequire.init = function mockInit() {}
-		apimanagerx.loadOnLoad = function mockLoadOnLoad() {}
 		apionloader.doOnLoads = function mockDoOnLoads() {}
 		emailer.setSendMail = function mockSetSendMail() {}
 
@@ -205,7 +197,6 @@ exports['AppInit:'] = {
 		apperror.addErrorListener = ae
 		anomaly.initAnomaly = _ai
 		getrequire.init = gi
-		apimanagerx.loadOnLoad = lo
 		apionloader.doOnLoads = dd
 		emailer.setSendMail = sm
 		anomaly.enableAnomalyMail = ea

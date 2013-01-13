@@ -25,7 +25,7 @@ exports['GetRequire:'] = {
 		assert.exportsTest(getrequire, 3)
 	},
 	'Init': function () {
-		getrequire.init()
+		getrequire.init({appData: {}})
 	},
 	'GetRequire': function () {
 		var actual = getrequire.getRequire(function () {})
@@ -58,10 +58,11 @@ exports['GetRequire:'] = {
 		assert.equal(actual.emitter.id, emScope)
 	},
 	'GetRequire InitApi Wrapper': function () {
+		var api = 'API'
 		var initApi = function () {}
 		var theExports = {}
 
-		getrequire.getRequire(function () {}, theExports, {initApi: initApi})
+		getrequire.getRequire(function () {}, theExports, {api: api, initApi: initApi})
 
 		assert.equal(typeof theExports.initApi, 'function')
 		assert.notEqual(theExports.initApi, initApi)
@@ -152,7 +153,7 @@ exports['GetRequire:'] = {
 			apiPath: 1,
 		}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var actual = getrequire.getApiData()
 		assert.deepEqual(actual, expected)
 	},
@@ -163,26 +164,37 @@ exports['GetRequire:'] = {
 }
 
 exports['InitApiWrapper:'] = {
-	'Opts': function () {
-		var initApi = function (opts) {aOpts.push(opts)}
-		var exports = {}
-		var opts = {a: 1}
-		var aOpts = []
+	'InitApi Opts Mixin': function () {
+		var moduleName = 'MODULE'
+		var api = 'APINAME'
+		var jsonOpts = {json: 1}
+		var invocationOps = {invocation: 1}
+		var mixedOpts = {}
+		for (var p in jsonOpts) mixedOpts[p] = jsonOpts[p]
+		for (var p in invocationOps) mixedOpts[p] = invocationOps[p]
 
+		var aInitApiOpts = []
+		var eInitApiOpts = [mixedOpts]
+		var initApi = function (o) {aInitApiOpts.push(o)}
+
+		// add the api to get an initApi Wrapper function
 		apilist.addApi = function () {return {}}
-		var actual = getrequire.getRequire(function () {}, exports, {initApi: initApi})
+		var actual = getrequire.getRequire(function () {}, exports, {api: api, initApi: initApi})
 
 		assert.equal(typeof exports.initApi, 'function')
-		exports.initApi(opts)
+		var initApiWrapper = exports.initApi
 
-		assert.equal(aOpts.length, 1)
-		var initAppOpts = aOpts[0]
-		assert.ok(initAppOpts)
-		assert.deepEqual(initAppOpts.config, opts)
-		assert.equal(typeof initAppOpts.logger, 'function')
-		assert.equal(initAppOpts.apprunner, apprunner)
-		assert.equal(initAppOpts.appName, undefined)
-		assert.equal(Object.keys(initAppOpts).length, 4)
+		// setup exportsMap translating from module name to exports object
+		var exportsMap = {}
+		exportsMap[moduleName] = exports
+		// setup apiConfigs translating from module name to json opts
+		var apiConfigs = {}
+		apiConfigs[moduleName] = jsonOpts
+		getrequire.init({apiOpts: {apiMap: apiConfigs}, appData: {}}, null, exportsMap)
+
+		initApiWrapper(invocationOps)
+
+		assert.deepEqual(aInitApiOpts, eInitApiOpts)
 	},
 	'after': function () {
 		apilist.addApi = aa
@@ -202,7 +214,7 @@ exports['ApiRequire:'] = {
 		module[subPath] = expected
 		var require = function (module) {assert.equal(module, file); return module}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
 
@@ -217,7 +229,7 @@ exports['ApiRequire:'] = {
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {assert.equal(module, file); throw e}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		assert.throws(function () {
 			apiRequire(moduleName)
@@ -232,7 +244,7 @@ exports['ApiRequire:'] = {
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {assert.equal(module, file); throw e}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		assert.throws(function () {
 			apiRequire(moduleName)
@@ -243,7 +255,7 @@ exports['ApiRequire:'] = {
 		var expected = 5
 		var require = function (module) {assert.equal(module, moduleName); return expected}
 
-		getrequire.init()
+		getrequire.init({appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
 
@@ -263,7 +275,7 @@ exports['ApiRequire:'] = {
 			return expected
 		}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		haraldutil.getType = function () {return 1}
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
@@ -283,7 +295,7 @@ exports['ApiRequire:'] = {
 			return expected
 		}
 
-		getrequire.init(apiOpts)
+		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
 

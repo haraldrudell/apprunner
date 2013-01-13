@@ -20,15 +20,16 @@ exports['ApiOnloader:'] = {
 		var aInit = 0
 		var testMap = {}
 		testMap[api] = {initApi: function mockInitApi() {aInit++}}
-		getrequire.init(undefined, undefined, testMap)
+		getrequire.init({appData: {}}, testMap)
 
 		getrequire.getApiData = function mockGetApiData() {return {onloads: [api]}}
-		apionloader.doOnLoads(function () {})
+debugger
+		apionloader.doOnLoads(function mockLog() {})
 
 		assert.ok(aInit)
 	},
 	'after': function () {
-		getrequire.init(undefined, undefined, false)
+		getrequire.init({appData: {}}, false)
 		getrequire.getApiData = ga
 
 	}

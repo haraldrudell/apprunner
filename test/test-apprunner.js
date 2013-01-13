@@ -10,6 +10,6 @@ exports['AppRunner:'] = {
 	},
 	'Exports': function () { // verify error-free require
 		var apprunner = require('../lib/apprunner')
-		assert.exportsTest(apprunner, 14, {rqs: 'object', emailer: 'object'})
+		assert.exportsTest(apprunner, 11)
 	},
 }
