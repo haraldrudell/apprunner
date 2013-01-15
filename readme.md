@@ -1,168 +1,266 @@
 # App Runner
 
-App Runner manages app execution and error reporting and provides a unified way to separate and reuse modules. Require is great, App Runner is greater!
+App Runner manages app lifecycle
 
 ## Benefits
 
-1. Move apis between project files and external modules with no code change, or switch implementation for a given api name
-2. Implement one or many apis per file or module.
-2. Configure apis both per invocation and json at launch.
-3. Find root causes by collecting large volumes of elaborate error reports featuring multiple stack traces, variable values and any other useful information.
-4. Continue best effort execution after error reporting.
-5. Server flexibility: apis can register uri routes, but do not depend on a particular Web server implementation.
-6. Gracefully terminate after unhandled process exceptions capturing elaborate error reports.
-7. Gracefully shut down the application on demand using SIGINT signal from keyboard Ctrl-Break or another process
-8. Gracefully launch using api delayed readiness hook
-9. Gracefully exit using api shutdown hook
-9. Track performance of external interfaces using invocation timers
+* Flexible module loading provide choice of implementation with no code change
+* Api lifecycle allows module spin-up/shutdown and settings from file data.
+* Easier troubleshooting with emailed anomaly reports
+* Orderly shutdown on exception and signal avoids data loss
 
 ## Features
 
-1. Provides module control from json
-2. Manages application error reports and queues
-3. Lifecycle management of the app and its modules
-5. Single-module exposure of the entire app to the launch script
+1. Self-contained email forwarding and anomaly detection/reporting
+2. require replacement
+3. api module support with api names, error emiters, request timers, across-api function, settings mix-in and ready watchers
+4. Separation between web server implementation and app code
+5. Configurable handlers for SIGINT SIGURS2, uncaught exception
 
-# Reference
+# Function Reference
 
-App Runner handles process exceptions and SIGINT.
-* Exit code 0 is SIGINT
-* Exit code 2 is unhandled exception
-
-## initApp(defaults, app)
-
+## initApp(defaults)
+Initialize apprunner
+```js
+require('apprunner').initApp(require('haraldops').init({
+  appName: 'Node God',
+  api: {
+    apiMap: {
+      nodegodweb: {
+        onLoad: true,
+        sessionSecret: 'veryGreat',
+        PORT: 1111,
+      }
+    }
+  }
+}))
+```
 * defaults: options, typically loaded by haraldops
 
-  * .init.appFolder: string: the folder of initial script
-  * .init.logger: optional function(string): logging, default console.log
-  * .init.ops.sendMail: optional function(subject, body): Sends mail, default none
-  * .api: optional, indicates that Api Manager should be used
-  * .api.apiMap: optional: api configurations
+  * .init.noInfoLog: boolean: no logging by appInit
+  * .anomaly: object for anomalysettings of false for disable
 
-* app: Web server, could be an event emitter and have a .get method
-
-## getApi(opts)
-
-Example of using a proprietary serverhelp api, that manages Express lifecycle as an api.
-
+## getAppData()
+Retrieve key app data
 ```js
-require('apprunner')
-	.getApi({api: 'serverhelp'})
-	.listen({
-		server: app,
-		port: defaults.PORT,
-		interface: defaults.appInterface},
-	cbc.add(appIsUp))
+console.log(require('apprunner').getAppData())
+```
+```
+{
+  appName: 'Cloud Clearing',
+  appId: 'cloudclearing',
+  launchFolder: '/home/foxyboy/Desktop/c505/node/cloudclearing',
+  sendMail: [Function: send],
+  logger: [Function],
+  registerHandler: [Function: registerHandler],
+  views: { dbview: { db: [Object] } },
+  defaultsFile: '/home/foxyboy/apps/cloudclearing.json'
+}
 ```
 
-gets an api implementation
-* opts: object
-* .api: string: name of api function to be loaded
+## getRequire(require, exports, opts)
 
-APIs are either configured directly in the opts object, or in defaults provided at App Runner's init.
+Provides a require with a flexible search for modules
+```
+require = require('apprunner').getRequire(require)
+require('myaliasedmodule')
+```
+
+Registers an api with apprunner, providing emitter, rqs object and initApi wrapper
+```
+require = require('apprunner').getRequire(require, exports, {
+  api: 'FB Friends', initApi: initApi, endApi: endApi,
+  rqScope: true, timeoutMs: time10s, ready: false})
+```
+* options
+  * .api: optional string: unique api name eg. 'Server Helper'
+  * .emScope if emitter, this emitter will be used. id property will be updated
+  * .emScope if string: scope for emitter
+  * .initApi: optional function: the internal initApi implementation
+  * .rqScope: optional string or boolen, string slogan for request timer, true if using api name
+  * .cb(err): optional function: rqs error callback
+  * .timeoutMs: number ms: default rqs timeout if not 3 seconds
+  * .ready: positive number: timeout for ready in ms
+  * .ready false: this api does not emit ready
+  * .ready defaults: ready with timeout 3 s
+  * .saveApi: optional function
+  * .endApi: optional function
+  * .apiState: optional function
+
+1. An emitter will be created if emScope or apiName is non-zero string at require.emitter
+2. A request timer will be provided if rqScope is true or non-zero string at require.rqs
+3. The api will be managed if there is a non-zero api name. emitter and initApi are required. api name at require.emitter.id
 
 ## apisReady(cb)
 
-Surveys all loaded apis to see if they have concluded initializing. Each api can expose an apiReady(cb) function used fo this purpose.
+Surveys all apis with singleton ready to see if they have concluded initializing.
 
 ## anomaly(...)
 
-Report any argument as an anomaly, to the log and if so configured a periodcal email.
+Report any argument as an anomaly, to the log and possibly via email
+```js
+require('apprunner').anomaly(err, {location: 'kitchen', user: 'fail'}, err2)
+```
 
 ## enableAnomalyMail(flag)
+control emailing of anomaly reports.
+```js
+require('apprunner').enableAnomalyMail('1/1/2013')
+```
+* flag either a date string or boolean flag, default: false
 
-control emailing on or off: flag: boolean, default: false
+Anomaly reports are not sent until the day after the date provided.
 
 ## addErrorListener(emitter)
 
-Adds an error listener to the EventEmitter. Safe: can be invoked with any value, or repeatedly invoked.
+Adds an error listener to the EventEmitter.
+
+Safe: can be invoked with any value, or repeatedly invoked.
 
 ## removeErrorListener(emitter)
 
-Removes an error listener to the EventEmitter. Safe: can be invoked with any value, or repeatedly invoked.
+Removes an error listener to the EventEmitter.
+
+Safe: can be invoked with any value, or repeatedly invoked.
 
 ## shutdown(exitCode)
 
-Shuts the application down. All apis that have exposed an endApi function gets this invoked prior to process.exit
+Shuts the application down. All apis that have exposed an saveApi or endApi gets these functions invoked prior to process.exit
 
-## getCbCounter()
-Ensures that all callbacks has completed
+App Runner handles process exceptions and SIGINT (ie. ctrl-Break.)
+* Exit code 0 is SIGINT
+* Exit code 2 is unhandled exception
 
+## addUriHandler(fn)
+
+Provides a function for a Web server instance that registers incoming uri and handlers
 ```js
 var apprunner = require('apprunner')
-var cbc = haraldutil.getCbCounter()
-setTimeout(cbc.add(callback), 100)
-setTimeout(cbc.add(callback), 100)
+var express = require('express')
 
-function callback() {
-  if (cbc.isDone(arguments.callee))
-    console.log('All callbacks completed.')
-  else console.log('Not done yet...')
+var app = apprunner.addErrorListener(express())
+apprunner.addUriHandler(app.get.bind(app))
+```
+* fn(uri, uriHandler): function, uri: string, uriHandler: function
+
+## getRqs(errorCallback, scopeName, defaultTimeoutMs)
+
+Get a timer factory
+```js
+var rqs = require('apprunner').getRqs(timeoutFn, 'UserStore Timers', 1000)
+
+var timer = rqs.addRq('Getting Token')
+userStore.getUser(fbId, saveOauthToken)
+
+function saveOauthToken(err, user) {
+  timer.clear()
+  ...
+}
+
+function timeoutFn(err) {
+  console.log('an anomaly was reported for a timed out request')
+  // maybe take alternative action
+  if (err.isTimer) {
+    if (err.param === 'Getting Token') ...
+  }
 }
 ```
+* errorCallback(err): function: invoked with err for timeouts and inconsitencies
+* scopeName: optional string or object: scope name for this factory eg. 'sync Db'
+* defaultTimeoutMs: optional number: default timeout in ms, min 100,  default 3 s
+
+1. rqs.addRq(parameter, time)
+2. rqs.clearRq(parameter) : same as .clear
+3. rqs.getState()
+4. rqs.shutdown()
+
+# Apis
+
+An api must be loaded using these two things:
+1. Being loaded using require from getRequire
+2. Provide its initApi function and api name to getRequire
+
+## What's the Difference Between an Api and a Module?
+
+1. An singleton api or api instances returned by initApi can be required to emit ready
+2. An api's initApi is provided options that is json-configured options overriden by invocation options
+3. An api can have onLoad: true
+4. An api has a sigleton emitter at require.emitter
+5. An api has a module name like all modules but also an api name at require.emitter.id
+6. An api can export the special endApi, saveApi and apiState functions
+7. An api can get a timer factory at require.rqs
+
+## Loading an Api
+Singleton
+```js
+require = require('apprunner').getRequire(require)
+require('serverhelp').listen()
+require('mongo').on('ready', mongoReady)
 ```
-Not done yet...
-All callbacks completed.
+Instance
+```js
+require = require('apprunner').getRequire(require)
+var fb = require('fb')
+fb.initApi({user: userId}).on('ready', fbReady)
 ```
-var cbc = getCbCounter(opts)
-* opts: optional object
-* opts.emitter: optional event emitter or boolean. default: errors are thrown
 
-  * false: errors are ignored
-  * emitter: errors are emitted
-
-* opts.callback: function or array of function: add is done for each function
-
-cbc: object
-* .add(f): adds a callback for function f, return value: f
-* .isDone(f): notes one callback completed. returns true if all callbacks complete, otherwise false
-* .getStatus(): gets an object representing the current state
-
-# Configuring and Writing an Api Module
-
-Configurations for an api is provided either in defaults or in the opts
-
-## Retrieving an api
-
-As a minimum, the opts object needs to contain the api property: `getApi({api: 'userstore'})`
-
-## How the api is loaded
-
-An Api's location is determined by two properties:
-
-1. .file: the same value you would provide to require
-2. .subPath: dot-separated property access inside the module loaded by require
-
-If file is missing some special steps are taken:
-
-1. If file is missing, the default filename is the api name.
-2. defaults.api.folder can provide a default folder used if file begings with '.' or is missing
-3. If no folder is provided, the lib folder in appFolder is used.
-
-## The api module
-
-The api module itself can have four optional special exports:
-* initApi(opts): code executed on the first load of the api processing the options. May return a value that is used in place of the regular module value
-* apiReady(cb(err)) calls back when the api is ready to provide service
-* endApi(cb(err)) instructs the api to shut down, ie. close connections and clear timers
-* emitter if this is an EventEmitter, errors emitted are processed as anomalies
-
-## Execution of initApi
-
-if your api exports initApi, ths function is invoked on each require. This is because options may change, and you need to take this in account.
-
-initApi is provided an options object:
-
-* .config: object: the merge of options providing to getApi and options in apiMap. getApi options overrride
-* .registerHandler(string route, handler(req, res, next)): registers a route with whatever Web server is used. 
-* .logger: function(string): the logging to be used
-* .apprunner: object: the apprunner module for convenience
-
-if initApi returns a value, this is used as the result of getApi().
-
-# Examples
-
-TODO
+## Writing an Api
+Singleton
+```js
+require = require('apprunner').getRequire(require, exports, {
+  api: 'MongoD', initApi: initApi, endApi: endApi,
+  rqScope: true, ready: false})
+function someExport(...) ...
+```
+Instance
+```
+require = require('apprunner').getRequire(require, exports, {
+  api: 'User Store', initApi: initApi,
+  })
+function initApi(opts) {
+  ...
+  var readyState
+  doSome(someCb)
+  function someCb(err, data) {
+    readyState = err || true
+    var eArgs = ['ready']
+    if (err) eArgs.push(err)
+    e.emit.apply(e, eArgs)
+  }
+  var e = new events.EventEmitter
+  e.isReady = isReady
+  return e
+  function isReady() {
+    return readyState
+}
+}
+```
+## Api settings
+Api settings are provided in the defaults object for appInit()
+```js
+{
+    "api": {
+    "path": [
+      {
+        "folder": "lib"
+      },
+      {
+        "file": "applego"
+      }
+    ],
+    "apiMap": {
+      "expressapi": {
+        "onLoad": true,
+        "sessionSecret": "secrets",
+        "port": 3003
+      },
+}
+```
+* path: optional array of locations
+* apiMap: optional object with api settings
+  * each entry can have onLoad, folder/subPath/file along with other settings
+1. A location can have folder/subPath: a string relative to the app's launch folder and a dot-separated name spacing in the loaded module
+2. A location can have  file/subpath where file is a module name and subpath is a dot-separated name spacing in the loaded module
 
 # Notes
 

@@ -91,7 +91,7 @@ exports['AppInit:'] = {
 		anomaly.enableAnomalyMail = function mockEnableAnomalyMail(x) {aEnableAnomalyMail.push(x)}
 
 		var aInitAnomaly = []
-		var eInitAnomaly = [[defaults.anomaly, mockSendMail, defaults.init.logger]]
+		var eInitAnomaly = [[defaults.anomaly, emailer.send, defaults.init.logger]]
 		anomaly.initAnomaly = function mockInitAnomaly(d, s, l) {aInitAnomaly.push([d, s, l])}
 
 		console.log = function () {} // I want to test the console.log statements, too
@@ -134,7 +134,8 @@ exports['AppInit:'] = {
 			appName: defaults.init.appName,
 			launchFolder: getLaunchFolder(),
 			appId: defaults.init.identifier,
-			registerHandler: 'f'
+			registerHandler: 'f',
+			views: undefined,
 		}
 		var actual = appinit.getAppData()
 
