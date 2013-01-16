@@ -1,7 +1,8 @@
 // test-apperror.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var apperror = require('../lib/apperror')
+
 var anomaly = require('../lib/anomaly')
 // http://nodejs.org/api/events.html
 var events = require('events')
@@ -12,6 +13,9 @@ var _an = anomaly.anomaly
 var assert = require('mochawrapper')
 
 exports['App Error Listeners:'] = {
+	'Exports': function () {
+		assert.exportsTest(apperror, 3)
+	},
 	'Add Error Listener': function () {
 		var e = new events.EventEmitter()
 		apperror.addErrorListener(e)

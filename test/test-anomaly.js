@@ -1,33 +1,20 @@
 // test-anomaly.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var anomaly = require('../lib/anomaly')
+
 // http://nodejs.org/api/os.html
 var os = require('os')
 
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')
 
-var exportsCount = 4
-var anomalyType = 'object'
-var exportsTypes = {}
-
 var anomalySubject = 'Anomaly Report'
 var anomalyBodyStart = 'Anomaly '
 
 exports['Anomaly:'] = {
 	'Exports': function () {
-
-		// if export count changes, we need to write more tests
-		assert.equal(typeof anomaly, anomalyType, 'Module type incorrect')
-		assert.equal(Object.keys(anomaly).length, exportsCount, 'Export count changed')
-
-		// all exports function
-		for (var exportName in anomaly) {
-			var actual = typeof anomaly[exportName]
-			var expected = exportsTypes[exportName] || 'function'
-			assert.equal(actual, expected, 'Incorrect type of export ' + exportName)
-		}
+		assert.exportsTest(anomaly, 4)
 	},
 	'InitAnomaly AnomalyDown': function (done) {
 		anomaly.initAnomaly()
@@ -110,7 +97,6 @@ exports['Anomaly:'] = {
 			console.log('anomaly log:', arguments)
 		}
 		function mockLog(a) {
-//console.error(arguments.callee.name, a)
 			logs++
 		}
 	},

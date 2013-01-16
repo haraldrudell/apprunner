@@ -1,5 +1,5 @@
 // test-apilist.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var apilist = require('../lib/apilist')
 

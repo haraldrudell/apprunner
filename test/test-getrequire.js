@@ -1,5 +1,5 @@
 // test-getrequire.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var getrequire = require('../lib/getrequire')
 

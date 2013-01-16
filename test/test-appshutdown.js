@@ -1,5 +1,5 @@
 // test-appshutdown.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var appshutdown = require('../lib/appshutdown')
 var anomaly = require('../lib/anomaly')

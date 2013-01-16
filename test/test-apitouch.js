@@ -1,5 +1,5 @@
 // test-apitouch.js
-// © Harald Rudell 2013
+// © Harald Rudell 2013 MIT License
 
 var apitouch = require('../lib/apitouch')
 

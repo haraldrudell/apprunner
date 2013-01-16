@@ -1,0 +1,31 @@
+2013-01-16 0.2.3 apprunner.AppData takes appInfo, License Changelog test pass
+2013-01-14 handle haraldops responder appdata.views, initApi wrapper with getRequire laod mandatory, detetct recurive require failures, readme, test pass
+2013-01-13 0.2.1 isReady ok while instance ready
+2013-01-12 0.2.0 Simpler architecture. Documentation forthcoming.
+2013-01-12 0.1.8 getAppData, addUriHandler, appData.registerHandler, apiState, 0.2beta3
+2013-01-12 0.1.7 getAppData, addUriHandler, appData.registerHandler, apiState, 0.2beta3
+2013-01-09 0.1.6 Api ready timeouts getAppID getLaunchFolder, 0.2beta2
+2013-01-09 0.1.5 new architecture test coverage 80%: 0.2 test relase
+2012-12-30 0.1.4 new architecture features path and onLoad
+2012-12-29 0.1.2 New api architecture beta, Anomaly email subject with app and server
+2012-12-25 0.1.2 emailer.send anomaly fix
+2012-12-25 0.1.1 registerHandler fix
+2012-12-25 0.1.0 addRoutes to allow for deferred adding of routes
+2012-12-22 0.0.17 defaults.anomaly.noEmail parsing
+2012-12-22 0.0.16 use getISOPacific, defaults.anomaly.noEmail can be date string local timezone
+2012-09-28 0.0.15 defaults.noInfoLog, ignoreException
+2012-09-20 0.0.14 shutdown prints times
+2012-09-18 0.0.13 new api spec
+2012-09-15 0.0.12 rqs updated
+2012-09-12 0.0.11 timeouts on touching all apis
+2012-09-12 0.0.10 ifConfigured option
+2012-09-12 0.0.9 provides apprunner, initApi every getApi
+2012-09-12 0.0.7 api lifecycle
+2012-09-10 0.0.6 flexibility in exports
+2012-09-10 0.0.5 USRSIG2, no cb on getApi
+2012-09-10 0.0.4 SIGUSR2 writes app data
+2012-09-10 0.0.3 startup fixes
+2012-09-10 0.0.2 use of anomaly and api manager default
+2012-09-10 0.0.1 websockets helper
+2012-09-10 0.0.0 Ready to publish
+2012-09-03 0.0.0

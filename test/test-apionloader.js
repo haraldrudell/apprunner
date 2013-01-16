@@ -1,5 +1,5 @@
 // test-apionloader.js
-// © Harald Rudell 2013
+// © Harald Rudell 2013 MIT License
 
 var apionloader = require('../lib/apionloader')
 

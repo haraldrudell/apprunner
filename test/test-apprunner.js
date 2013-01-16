@@ -1,5 +1,5 @@
 // test-apprunner.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 // https://github.com/haraldrudell/mochawrapper
 var assert = require('mochawrapper')

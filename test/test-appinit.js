@@ -1,5 +1,5 @@
 // test-appinit.js
-// © Harald Rudell 2012
+// © Harald Rudell 2012 MIT License
 
 var appinit = require('../lib/appinit')
 
@@ -52,7 +52,7 @@ exports['AppInit:'] = {
 		appinit.initApp(defaults)
 
 		assert.equal(appShutdownInits, 1)
-		assert.equal(aAddErrorListener, 2)
+		assert.equal(aAddErrorListener, 1)
 		assert.equal(aInit, 1)
 		assert.equal(aDoOnLoads, 1)
 	},
@@ -73,7 +73,7 @@ exports['AppInit:'] = {
 		}
 
 		var aAddErrorListener = []
-		var eAddErrorListener = ['emitter', appinit.testEmitter()]
+		var eAddErrorListener = [appinit.testEmitter()]
 		apperror.addErrorListener = function mockAddErrorListener(o) {aAddErrorListener.push(o)}
 
 		appshutdown.init = function mockAppShutdownInit() {}
@@ -98,7 +98,6 @@ exports['AppInit:'] = {
 		appinit.initApp(defaults)
 		console.log = _log
 
-		assert.ok((eAddErrorListener[0] = aAddErrorListener[0]) instanceof events.EventEmitter)
 		assert.deepEqual(aAddErrorListener, eAddErrorListener)
 		assert.deepEqual(aEnableAnomalyMail, eEnableAnomalyMail)
 		assert.deepEqual(aInitAnomaly, eInitAnomaly)

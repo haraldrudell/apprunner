@@ -40,7 +40,7 @@ require('apprunner').initApp(require('haraldops').init({
   * .init.noInfoLog: boolean: no logging by appInit
   * .anomaly: object for anomalysettings of false for disable
 
-## getAppData()
+## getAppData(appInfo)
 Retrieve key app data
 ```js
 console.log(require('apprunner').getAppData())
@@ -57,6 +57,8 @@ console.log(require('apprunner').getAppData())
   defaultsFile: '/home/foxyboy/apps/cloudclearing.json'
 }
 ```
+* appInfo: optional object PORT:numer, URL: string
+Forwarded on signal to [Node God](https://github.com/haraldrudell/nodegod)
 
 ## getRequire(require, exports, opts)
 
@@ -177,6 +179,7 @@ function timeoutFn(err) {
 # Apis
 
 An api must be loaded using these two things:
+
 1. Being loaded using require from getRequire
 2. Provide its initApi function and api name to getRequire
 
@@ -195,13 +198,13 @@ Singleton
 ```js
 require = require('apprunner').getRequire(require)
 require('serverhelp').listen()
-require('mongo').on('ready', mongoReady)
+require('mongo').once('ready', mongoReady)
 ```
 Instance
 ```js
 require = require('apprunner').getRequire(require)
 var fb = require('fb')
-fb.initApi({user: userId}).on('ready', fbReady)
+fb.initApi({user: userId}).once('ready', fbReady)
 ```
 
 ## Writing an Api
