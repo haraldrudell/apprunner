@@ -207,15 +207,16 @@ exports['ApiRequire:'] = {
 		var moduleName = 'MODULENAME'
 		var file = 'FILE'
 		var subPath = 'PATH'
-		var expected = 5
-		var aRequire = []
+
 		var apiOpts = {apiMap: {}}
 		apiOpts.apiMap[moduleName] = {file: file, subPath: subPath}
+		getrequire.init({apiOpts: apiOpts, appData: {}})
+
+		var expected = 5
 		var module = {}
 		module[subPath] = expected
-		var require = function (module) {assert.equal(module, file); return module}
+		var require = function mockRequire(moduleName) {assert.equal(moduleName, file); return module}
 
-		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
 
@@ -270,7 +271,7 @@ exports['ApiRequire:'] = {
 		var e = new Error('not found')
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {
-			if (module == moduleName) throw e
+			if (module === moduleName) throw e
 			var expected1 = folder + '/' + moduleName
 			assert.equal(module.slice(-expected1.length), expected1, 'Asked for wrong module name: ' + module)
 			return expected
@@ -283,20 +284,23 @@ exports['ApiRequire:'] = {
 
 		assert.equal(actual, expected)
 	},
-	'GetRequire Path Module': function () {
+	'GetRequire Path File subPath NoNameSpacing': function () {
 		var moduleName = 'MODULENAME'
-		var expected = 5
+
 		var otherModule = 'OTHERMODULE'
-		var apiOpts = {path: [{file: otherModule, subPath: ''}]}
-		var e = new Error('not found')
+		var apiOpts = {path: [{file: otherModule, subPath: null}]}
+		getrequire.init({apiOpts: apiOpts, appData: {}})
+
+		var expected = 5
+		var e = new Error('not found' + moduleName)
 		e.code = 'MODULE_NOT_FOUND'
 		var require = function (module) {
-			if (module === moduleName) throw e
+			if (module === moduleName) throw e // fail moduleName first, so apiRequire attempts path
 			assert.equal(module, otherModule, 'Asked for wrong module name: ' + module)
+debugger
 			return expected
 		}
 
-		getrequire.init({apiOpts: apiOpts, appData: {}})
 		var apiRequire = getrequire.getRequire(require)
 		var actual = apiRequire(moduleName)
 
