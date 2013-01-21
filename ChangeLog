@@ -1,3 +1,4 @@
+2013-01-21 0.2.6 appshutdown infoLog, remove anomaly on sigusr2
 2013-01-20 0.2.5 anomaly refactored, appinit noInfoLog, appshutdown infoLog
 2013-01-17 0.2.4 apiRequire allows folder override, anomaly log avoids inspect
 2013-01-16 0.2.3 apprunner.AppData takes appInfo, License Changelog test pass
