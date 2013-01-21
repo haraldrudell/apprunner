@@ -10,14 +10,15 @@ var assert = require('mochawrapper')
 
 exports['Emailer:'] = {
 	'Exports': function () {
-		assert.exportsTest(emailer, 2)
+		assert.exportsTest(emailer, 3)
 	},
-	'Send and SetSendMail': function () {
+	'Send SetSendMail HasSendMail': function () {
 		var subject = 'SUBJECT'
 		var body = 'BODY'
 		var sends = 0
 
 		emailer.setSendMail(mockSend)
+		assert.ok(emailer.hasSendMail)
 		emailer.send({subject: subject, body: body})
 		assert.equal(sends, 1)
 

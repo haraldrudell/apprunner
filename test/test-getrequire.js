@@ -297,7 +297,6 @@ exports['ApiRequire:'] = {
 		var require = function (module) {
 			if (module === moduleName) throw e // fail moduleName first, so apiRequire attempts path
 			assert.equal(module, otherModule, 'Asked for wrong module name: ' + module)
-debugger
 			return expected
 		}
 

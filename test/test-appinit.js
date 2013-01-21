@@ -62,8 +62,10 @@ exports['AppInit:'] = {
 				noEmail: '1/1/2013',
 				app: 'expressObject',
 			},
+			apprunner: {
+				log: 3,
+			},
 			init: {
-				logger: 3,
 				ops: {
 					sendMail: mockSendMail,
 				},
@@ -91,8 +93,8 @@ exports['AppInit:'] = {
 		anomaly.enableAnomalyMail = function mockEnableAnomalyMail(x) {aEnableAnomalyMail.push(x)}
 
 		var aInitAnomaly = []
-		var eInitAnomaly = [[defaults.anomaly, emailer.send, defaults.init.logger]]
-		anomaly.initAnomaly = function mockInitAnomaly(d, s, l) {aInitAnomaly.push([d, s, l])}
+		var eInitAnomaly = [[defaults.anomaly, defaults.apprunner.log]]
+		anomaly.initAnomaly = function mockInitAnomaly(o, l) {aInitAnomaly.push([o, l])}
 
 		console.log = function () {} // I want to test the console.log statements, too
 		appinit.initApp(defaults)

@@ -15,7 +15,7 @@ var path = require('path')
 var _log = console.log
 var _exit = process.exit
 var _on = process.on
-var _ad = anomaly.anomalyDown
+var _ad = anomaly.shutdown
 var an = anomaly.anomaly
 var wf = fs.writeFile
 var iea = apilist.invokeEndApi
@@ -53,7 +53,7 @@ exports['App Shutdown:'] = {
 		assert.equal(typeof aOn.SIGINT, 'function')
 
 		var aDowns = 0
-		anomaly.anomalyDown = function(cb) {aDowns++; cb()}
+		anomaly.shutdown = function(cb) {aDowns++; cb()}
 
 		var aExits = []
 		var eExits = [0]
@@ -74,7 +74,7 @@ exports['App Shutdown:'] = {
 		var processException = getHandler('uncaughtException')
 
 		// emulate process exception: invoke processException with an Error argument
-		anomaly.anomalyDown = function (cb) {aAnomalyDown++; cb()}
+		anomaly.shutdown = function (cb) {aAnomalyDown++; cb()}
 		anomaly.anomaly = function () {aAnomaly.push([arguments])}
 		process.exit = function (code) {aProcessExit.push(code)}
 		apilist.invokeEndApi = function (cb) {aEndApi++; cb()}
@@ -128,7 +128,7 @@ exports['App Shutdown:'] = {
 		console.log = _log
 		process.exit = _exit
 		process.on = _on
-		anomaly.anomalyDown = _ad
+		anomaly.shutdown = _ad
 		anomaly.anomaly = an
 		fs.writeFile = wf
 		apilist.invokeEndApi = iea

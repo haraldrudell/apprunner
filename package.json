@@ -13,7 +13,7 @@
 		"lifecycle",
 		"app"
 	],
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"contributors": [
 		{
 			"name": "Harald Rudell",
@@ -25,7 +25,7 @@
 		"mochawrapper": ">= 0.0.34"
 	},
 	"dependencies": {
-		"haraldutil": ">= 0.1.15"
+		"haraldutil": ">= 0.1.17"
 	},
 	"repository": {
 		"type": "git",
