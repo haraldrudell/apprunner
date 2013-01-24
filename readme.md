@@ -23,22 +23,22 @@ App Runner manages app lifecycle
 Initialize apprunner
 ```js
 require('apprunner').initApp(require('haraldops').init({
-  appName: 'Node God',
-  api: {
-    apiMap: {
-      nodegodweb: {
-        onLoad: true,
-        sessionSecret: 'veryGreat',
-        PORT: 1111,
-      }
-    }
-  }
+	appName: 'Node God',
+	api: {
+		apiMap: {
+			nodegodweb: {
+				onLoad: true,
+				sessionSecret: 'veryGreat',
+				PORT: 1111,
+			}
+		}
+	}
 }))
 ```
 * defaults: options, typically loaded by haraldops
 
-  * .init.noInfoLog: boolean: no logging by appInit
-  * .anomaly: object for anomalysettings of false for disable
+	* .init.noInfoLog: boolean: no logging by appInit
+	* .anomaly: object for anomalysettings of false for disable
 
 ## getAppData(appInfo)
 Retrieve key app data
@@ -47,14 +47,14 @@ console.log(require('apprunner').getAppData())
 ```
 ```
 {
-  appName: 'Cloud Clearing',
-  appId: 'cloudclearing',
-  launchFolder: '/home/foxyboy/Desktop/c505/node/cloudclearing',
-  sendMail: [Function: send],
-  logger: [Function],
-  registerHandler: [Function: registerHandler],
-  views: { dbview: { db: [Object] } },
-  defaultsFile: '/home/foxyboy/apps/cloudclearing.json'
+	appName: 'Cloud Clearing',
+	appId: 'cloudclearing',
+	launchFolder: '/home/foxyboy/Desktop/c505/node/cloudclearing',
+	sendMail: [Function: send],
+	logger: [Function],
+	registerHandler: [Function: registerHandler],
+	views: { dbview: { db: [Object] } },
+	defaultsFile: '/home/foxyboy/apps/cloudclearing.json'
 }
 ```
 * appInfo: optional object PORT:numer, URL: string
@@ -71,23 +71,23 @@ require('myaliasedmodule')
 Registers an api with apprunner, providing emitter, rqs object and initApi wrapper
 ```
 require = require('apprunner').getRequire(require, exports, {
-  api: 'FB Friends', initApi: initApi, endApi: endApi,
-  rqScope: true, timeoutMs: time10s, ready: false})
+	api: 'FB Friends', initApi: initApi, endApi: endApi,
+	rqScope: true, timeoutMs: time10s, ready: false})
 ```
 * options
-  * .api: optional string: unique api name eg. 'Server Helper'
-  * .emScope if emitter, this emitter will be used. id property will be updated
-  * .emScope if string: scope for emitter
-  * .initApi: optional function: the internal initApi implementation
-  * .rqScope: optional string or boolen, string slogan for request timer, true if using api name
-  * .cb(err): optional function: rqs error callback
-  * .timeoutMs: number ms: default rqs timeout if not 3 seconds
-  * .ready: positive number: timeout for ready in ms
-  * .ready false: this api does not emit ready
-  * .ready defaults: ready with timeout 3 s
-  * .saveApi: optional function
-  * .endApi: optional function
-  * .apiState: optional function
+	* .api: optional string: unique api name eg. 'Server Helper'
+	* .emScope if emitter, this emitter will be used. id property will be updated
+	* .emScope if string: scope for emitter
+	* .initApi: optional function: the internal initApi implementation
+	* .rqScope: optional string or boolen, string slogan for request timer, true if using api name
+	* .cb(err): optional function: rqs error callback
+	* .timeoutMs: number ms: default rqs timeout if not 3 seconds
+	* .ready: positive number: timeout for ready in ms
+	* .ready false: this api does not emit ready
+	* .ready defaults: ready with timeout 3 s
+	* .saveApi: optional function
+	* .endApi: optional function
+	* .apiState: optional function
 
 1. An emitter will be created if emScope or apiName is non-zero string at require.emitter
 2. A request timer will be provided if rqScope is true or non-zero string at require.rqs
@@ -155,16 +155,16 @@ var timer = rqs.addRq('Getting Token')
 userStore.getUser(fbId, saveOauthToken)
 
 function saveOauthToken(err, user) {
-  timer.clear()
-  ...
+	timer.clear()
+	...
 }
 
 function timeoutFn(err) {
-  console.log('an anomaly was reported for a timed out request')
-  // maybe take alternative action
-  if (err.isTimer) {
-    if (err.param === 'Getting Token') ...
-  }
+	console.log('an anomaly was reported for a timed out request')
+	// maybe take alternative action
+	if (err.isTimer) {
+		if (err.param === 'Getting Token') ...
+	}
 }
 ```
 * errorCallback(err): function: invoked with err for timeouts and inconsitencies
@@ -193,6 +193,21 @@ An api must be loaded using these two things:
 6. An api can export the special endApi, saveApi and apiState functions
 7. An api can get a timer factory at require.rqs
 
+<h2>What code should be an Api?</h2>
+<p>What source files should be designed as an api?</p>
+<ol>
+	<li>Modules that are shared across multiple apps or apis without being an npm package.</li>
+	<li>modules with specific needs:<ol>
+		<li>Instance matching</li>
+		<li>Managed lifecycle due to timers, open ports to or tcp connections</li>
+		<li>Singleton ready to delay app start</li>
+		<li>Configuration information like urls or passwords</li>
+		<li>Diagnostic error emitting</li>
+		<li>Provide ops information</li>
+		<li>Start using onLoad</li>
+	</ol>
+</ol>
+
 ## Loading an Api
 Singleton
 ```js
@@ -211,30 +226,30 @@ fb.initApi({user: userId}).once('ready', fbReady)
 Singleton
 ```js
 require = require('apprunner').getRequire(require, exports, {
-  api: 'MongoD', initApi: initApi, endApi: endApi,
-  rqScope: true, ready: false})
+	api: 'MongoD', initApi: initApi, endApi: endApi,
+	rqScope: true, ready: false})
 function someExport(...) ...
 ```
 Instance
 ```
 require = require('apprunner').getRequire(require, exports, {
-  api: 'User Store', initApi: initApi,
-  })
+	api: 'User Store', initApi: initApi,
+	})
 function initApi(opts) {
-  ...
-  var readyState
-  doSome(someCb)
-  function someCb(err, data) {
-    readyState = err || true
-    var eArgs = ['ready']
-    if (err) eArgs.push(err)
-    e.emit.apply(e, eArgs)
-  }
-  var e = new events.EventEmitter
-  e.isReady = isReady
-  return e
-  function isReady() {
-    return readyState
+	...
+	var readyState
+	doSome(someCb)
+	function someCb(err, data) {
+		readyState = err || true
+		var eArgs = ['ready']
+		if (err) eArgs.push(err)
+		e.emit.apply(e, eArgs)
+	}
+	var e = new events.EventEmitter
+	e.isReady = isReady
+	return e
+	function isReady() {
+		return readyState
 }
 }
 ```
@@ -242,26 +257,26 @@ function initApi(opts) {
 Api settings are provided in the defaults object for appInit()
 ```js
 {
-    "api": {
-    "path": [
-      {
-        "folder": "lib"
-      },
-      {
-        "file": "applego"
-      }
-    ],
-    "apiMap": {
-      "expressapi": {
-        "onLoad": true,
-        "sessionSecret": "secrets",
-        "port": 3003
-      },
+		"api": {
+		"path": [
+			{
+				"folder": "lib"
+			},
+			{
+				"file": "applego"
+			}
+		],
+		"apiMap": {
+			"expressapi": {
+				"onLoad": true,
+				"sessionSecret": "secrets",
+				"port": 3003
+			},
 }
 ```
 * path: optional array of locations
 * apiMap: optional object with api settings
-  * each entry can have onLoad, folder/subPath/file along with other settings
+	* each entry can have onLoad, folder/subPath/file along with other settings
 1. A location can have folder/subPath: a string relative to the app's launch folder and a dot-separated name spacing in the loaded module
 2. A location can have  file/subpath where file is a module name and subpath is a dot-separated name spacing in the loaded module
 
