@@ -287,7 +287,7 @@ exports['GetState:'] = {
 		var emitter = new events.EventEmitter
 		emitter.id = api
 		var expected = {}
-		expected[api] = {api: api, emitter: emitter, isReady: true}
+		expected[api] = {api: api, emitter: emitter, isReady: true, instanceReady: false}
 
 		apilist.testReset({addRq: function () {}})
 		apilist.addApi(emitter, {ready: false})
