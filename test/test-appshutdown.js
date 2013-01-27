@@ -90,7 +90,7 @@ exports['App Shutdown:'] = {
 		function getHandler(signal) {
 			var handler
 			process.on = function(e, f) {if (e == signal) handler = f}
-			appshutdown.init({})
+			appshutdown.init({log: function () {}})
 			process.on = _on
 			return handler
 		}
