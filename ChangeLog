@@ -1,3 +1,4 @@
+2013-02-02 0.2.11 getLog default log works
 2013-02-02 0.2.10 apprunner/ getRequire handles sub-module apprunners, appData.getLaunchFolder improved, split out initapiwrapper, apirequire
 2013-01-26 0.2.9/0.2.8 appData: log-getLog-anomaly, getTestConfig with launchFolder, can run w/o testapisetup. extracted appdata serverwrapper from appinit
 2013-01-24 0.2.7 concurrent singleton and instance ready, implemented .testIntercept(useTestConfig: __dirname})
